@@ -930,7 +930,7 @@
                 Background="Transparent"
                 Foreground="White">
                 <ui:TitleBar.Icon>
-                    <ui:ImageIcon Source="pack://application:,,,/Assets/arkduckbot-icon.ico" />
+                    <ui:ImageIcon Source="pack://application:,,,/Assets/rustplus-desktop-icon.ico" />
                 </ui:TitleBar.Icon>
             </ui:TitleBar>
         </Border>

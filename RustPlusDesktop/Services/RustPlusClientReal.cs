@@ -24,6 +24,7 @@ using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Xml.Linq;
+using SmartSwitchEventArg = RustPlusApi.Data.Events.SmartSwitchEventArg;
 using TeamMsgArg = RustPlusApi.Data.Events.TeamMessageEventArg;
 namespace ArkDuckBot.Services;
 
@@ -4918,7 +4919,7 @@ rp.connect();
         {
             if (_host is null) return (false, "keine Verbindung");
 
-            var legacy = new ArkLegacy(_host, _port, _steamId, _playerToken, _useProxyCurrent);
+            var legacy = new RustPlusLegacy(_host, _port, _steamId, _playerToken, _useProxyCurrent);
 
             var mConn = legacy.GetType().GetMethod("ConnectAsync", Type.EmptyTypes)
                        ?? legacy.GetType().GetMethod("ConnectAsync", new[] { typeof(CancellationToken) });
@@ -4930,7 +4931,7 @@ rp.connect();
                 if (r is Task t) await t;
             }
 
-            var asm = typeof(ArkLegacy).Assembly;
+            var asm = typeof(RustPlusLegacy).Assembly;
 
             var appRequestType =
                 asm.GetTypes().FirstOrDefault(t => t.Name.Equals("AppRequest", StringComparison.OrdinalIgnoreCase)) ??
@@ -5214,7 +5215,7 @@ rp.connect();
         if (_dumpedLegacy) return;
         _dumpedLegacy = true;
 
-        var asm = typeof(ArkLegacy).Assembly;
+        var asm = typeof(RustPlusLegacy).Assembly;
         var names = new[] { "AppRequest", "AppTurnSmartSwitch", "AppSetEntityValue", "AppResponse", "AppMessage" };
         foreach (var ty in asm.GetTypes().Where(t => names.Any(n => t.Name.IndexOf(n, StringComparison.OrdinalIgnoreCase) >= 0)))
         {

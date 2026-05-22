@@ -87,6 +87,12 @@ public class TrackingSettings
     public bool AnnounceNewKits { get; set; } = false;
     public bool AnnounceSuspiciousActivity { get; set; } = false;
     public bool AnnounceTradeAlerts { get; set; } = false;
+    public bool AnnounceNewShops { get; set; } = false;
+    public bool AnnounceSuspiciousShops { get; set; } = false;
+    public bool AnnounceCargo { get; set; } = false;
+    public bool AnnounceHeli { get; set; } = false;
+    public bool AnnounceChinook { get; set; } = false;
+    public bool AnnounceVendor { get; set; } = false;
     public Dictionary<string, bool> GroupStates { get; set; } = new();
     public Dictionary<string, List<string>> GroupOrder { get; set; } = new();
     public bool AnnounceCargoDocking { get; set; } = false;
@@ -630,6 +636,26 @@ public static class TrackingService
     {
         get => _settings.AnnounceTradeAlerts;
         set { _settings.AnnounceTradeAlerts = value; SaveDB(); }
+    }
+    public static bool AnnounceCargo
+    {
+        get => _settings.AnnounceCargo;
+        set { _settings.AnnounceCargo = value; SaveDB(); }
+    }
+    public static bool AnnounceHeli
+    {
+        get => _settings.AnnounceHeli;
+        set { _settings.AnnounceHeli = value; SaveDB(); }
+    }
+    public static bool AnnounceChinook
+    {
+        get => _settings.AnnounceChinook;
+        set { _settings.AnnounceChinook = value; SaveDB(); }
+    }
+    public static bool AnnounceVendor
+    {
+        get => _settings.AnnounceVendor;
+        set { _settings.AnnounceVendor = value; SaveDB(); }
     }
     public static bool AnnounceSpawnsMaster
     {

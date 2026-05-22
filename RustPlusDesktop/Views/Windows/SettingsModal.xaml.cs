@@ -31,8 +31,8 @@ namespace ArkDuckBot.Views
 
             // Load MCP settings
             McpHost = TrackingService.McpHost ?? "localhost";
-            McpPort = (TrackingService.McpPort ?? 8443).ToString();
-            AdminPort = (TrackingService.AdminPort ?? 8444).ToString();
+            McpPort = TrackingService.McpPort.ToString();
+            AdminPort = TrackingService.AdminPort.ToString();
             AiProvider = TrackingService.AiProvider ?? "openrouter";
 
             TxtMcpHost.Text = McpHost;

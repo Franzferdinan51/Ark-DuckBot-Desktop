@@ -277,7 +277,7 @@ public class McpBridgeClient : IDisposable
                     // Authentication successful, store player context
                     if (root.TryGetProperty("player", out var player))
                     {
-                        PlayerId = player.TryGetProperty("id", out var id) ? id.GetString() : null;
+                        PlayerId = player.TryGetProperty("id", out var playerIdProp) ? playerIdProp.GetString() : null;
                         PlayerName = player.TryGetProperty("name", out var name) ? name.GetString() : null;
                         PlayerTier = player.TryGetProperty("tier", out var tier) ? tier.GetString() : null;
                         TribeId = player.TryGetProperty("tribe", out var tribe) ? tribe.GetString() : null;

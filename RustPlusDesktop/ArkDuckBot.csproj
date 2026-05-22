@@ -5,7 +5,7 @@
 		<Nullable>enable</Nullable>
 		<UseWPF>true</UseWPF>
 		<UseWindowsForms>true</UseWindowsForms>
-		<ApplicationIcon>Assets\arkduckbot-icon.ico</ApplicationIcon>
+		<ApplicationIcon>Assets\rustplus-desktop-icon.ico</ApplicationIcon>
 
 		<!-- Fixes for Single-File Publish and Cleanup -->
 		<SatelliteResourceLanguages>en</SatelliteResourceLanguages>
@@ -16,6 +16,13 @@
 	<ItemGroup>
 
 	  <Compile Remove="RustPlusClientStub.cs" />
+	  <Compile Remove="Services\DuckBotAgent.cs" />
+	  <Compile Remove="Services\DuckBotAiService.cs" />
+	  <Compile Remove="Services\DuckBotHandler.cs" />
+	  <Compile Remove="Services\DuckBotKnowledge.cs" />
+	  <Compile Remove="Services\DuckBotOrchestrator.cs" />
+	  <Compile Remove="Services\DuckBotSkills.cs" />
+	  <Compile Remove="Services\DuckBotTools.cs" />
 	</ItemGroup>
 
 	<PropertyGroup>
@@ -137,11 +144,11 @@
 	  <None Remove="Assets\icons\vendor.png" />
 	  <None Remove="Assets\icons\watertreatment.png" />
 	  <None Remove="Assets\icons\waterwell.png" />
-	  <None Remove="Assets\Data\rust-item-list.json" />
+	  <None Remove="Assets\Data\ark-item-list.json" />
 	  <None Remove="Assets\icons\discord.png" />
 	  <None Remove="Assets\Images\RustPlus_V5_Thumbnail.jpg" />
 	  <None Remove="Assets\rustplus-desktop-icon.ico" />
-	  <None Remove="Assets\Data\rust_items.json" />
+	  <None Remove="Assets\Data\ark_items.json" />
 	  <None Remove="Assets\Screenshots\3.0_1.png" />
 	  <None Remove="Assets\Screenshots\3.0_2.png" />
 	  <None Remove="Assets\Screenshots\3.0_3.png" />
@@ -226,7 +233,7 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
     </Content>
-    <Content Include="Assets\Data\rust-item-list.json">
+    <Content Include="Assets\Data\ark-item-list.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
     </Content>
@@ -301,7 +308,7 @@
     <Resource Include="Assets\icons\vendor.png" />
     <Resource Include="Assets\icons\watertreatment.png" />
     <Resource Include="Assets\icons\waterwell.png" />
-    <Resource Include="Assets\Data\rust-item-list.json" />
+    <Resource Include="Assets\Data\ark-item-list.json" />
     <Resource Include="Assets\icons\discord.png" />
     <Resource Include="Assets\Images\RustPlus_V5_Thumbnail.jpg" />
     <Resource Include="Assets\rustplus-desktop-icon.ico" />
@@ -341,7 +348,7 @@
     <Resource Include="Assets\Screenshots\beta-5.1_7.png" />
     <Resource Include="Assets\Screenshots\Notifications.png" />
     <Resource Include="Assets\TitleScreen-rust-plus-desktop.png" />
-    <Resource Include="Assets\Data\rust_items.json" />
+    <Resource Include="Assets\Data\ark_items.json" />
     <Resource Include="Assets\Data\ShopSearch.html" />
   </ItemGroup>
 
