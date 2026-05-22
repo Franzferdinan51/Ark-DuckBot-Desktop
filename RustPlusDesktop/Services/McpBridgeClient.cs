@@ -39,6 +39,7 @@ public class McpBridgeClient : IDisposable
     public event EventHandler<string>? ThinkingStateChanged;
     public event EventHandler<GameEventArgs>? GameEventReceived;
     public event EventHandler<AuthSuccessEventArgs>? AuthSuccessReceived;
+    public event EventHandler<string>? StreamTokenReceived;
 
     public bool IsConnected => _webSocket?.State == WebSocketState.Open;
 
@@ -79,15 +80,19 @@ public class McpBridgeClient : IDisposable
         if (_webSocket?.State != WebSocketState.Open)
             throw new InvalidOperationException("Not connected");
 
+        // Match server.py auth format: player_id, display_name, tier, tribe_id, position, facing_yaw
         var payload = new
         {
             type = "auth",
             token = _sharedSecret,
             player = new
             {
-                id = "desktop_client",
-                name = "ArkDuckBot",
-                tier = "admin"
+                player_id = "desktop_client",
+                display_name = "ArkDuckBot",
+                tier = "admin",
+                tribe_id = (string?)null,
+                position = new { x = 0.0, y = 0.0, z = 0.0 },
+                facing_yaw = 0.0
             }
         };
 
@@ -114,18 +119,12 @@ public class McpBridgeClient : IDisposable
             throw new InvalidOperationException("Not authenticated with MCP Bridge");
 
         var requestId = Interlocked.Increment(ref _requestId);
+        // Match server.py player_message format: message, request_id, position, facing_yaw
         var payload = new
         {
             type = "player_message",
-            id = requestId,
-            message = prompt,
-            context = context ?? "",
-            sender = new
-            {
-                id = PlayerId ?? "desktop_client",
-                name = PlayerName ?? "ArkDuckBot",
-                tier = PlayerTier ?? "admin"
-            }
+            request_id = requestId.ToString(),
+            message = prompt
         };
 
         var json = JsonSerializer.Serialize(payload);
@@ -160,17 +159,12 @@ public class McpBridgeClient : IDisposable
         if (_webSocket?.State != WebSocketState.Open || !IsAuthenticated)
             throw new InvalidOperationException("MCP Bridge not connected or authenticated");
 
+        // Match server.py player_message format
         var payload = new
         {
             type = "player_message",
-            id = Interlocked.Increment(ref _requestId),
-            message = $"/{message}",
-            sender = new
-            {
-                id = PlayerId ?? "desktop_client",
-                name = PlayerName ?? "ArkDuckBot",
-                tier = PlayerTier ?? "admin"
-            }
+            request_id = Interlocked.Increment(ref _requestId).ToString(),
+            message = $"/{message}"
         };
 
         var json = JsonSerializer.Serialize(payload);
@@ -199,11 +193,12 @@ public class McpBridgeClient : IDisposable
         if (_webSocket?.State != WebSocketState.Open || !IsAuthenticated)
             return;
 
+        // Match server.py event format: { "type": "event", "data": { "event": "type", ... } }
+        var data = new Dictionary<string, object>(eventData) { { "event", eventType } };
         var payload = new
         {
             type = "event",
-            @event = eventType,
-            data = eventData
+            data
         };
 
         var json = JsonSerializer.Serialize(payload);
@@ -274,17 +269,13 @@ public class McpBridgeClient : IDisposable
             switch (type)
             {
                 case "auth_success":
-                    // Authentication successful, store player context
-                    if (root.TryGetProperty("player", out var player))
-                    {
-                        PlayerId = player.TryGetProperty("id", out var playerIdProp) ? playerIdProp.GetString() : null;
-                        PlayerName = player.TryGetProperty("name", out var name) ? name.GetString() : null;
-                        PlayerTier = player.TryGetProperty("tier", out var tier) ? tier.GetString() : null;
-                        TribeId = player.TryGetProperty("tribe", out var tribe) ? tribe.GetString() : null;
-                    }
+                    // Server sends flat: { "type": "auth_success", "player_id": "...", "tier": "...", "tools_available": N }
+                    PlayerId = root.TryGetProperty("player_id", out var pidProp) ? pidProp.GetString() : null;
+                    PlayerTier = root.TryGetProperty("tier", out var tierProp) ? tierProp.GetString() : null;
+                    PlayerName = PlayerId; // Server doesn't send display_name back
                     IsAuthenticated = true;
                     ConnectionStatusChanged?.Invoke(this, $"Connected as {PlayerName} ({PlayerTier})");
-                    AuthSuccessReceived?.Invoke(this, new AuthSuccessEventArgs(PlayerTier ?? "user"));
+                    AuthSuccessReceived?.Invoke(this, new AuthSuccessEventArgs(PlayerTier ?? "player"));
                     break;
 
                 case "thinking":
@@ -293,12 +284,14 @@ public class McpBridgeClient : IDisposable
                     break;
 
                 case "reply":
-                    // AI response with stats
-                    var id = root.TryGetProperty("id", out var reqId) ? reqId.GetInt32() : 0;
-                    var response = root.TryGetProperty("response", out var resp) ? resp.GetString() ?? "" : "";
+                    // Server sends: { "type": "reply", "message": "...", "request_id": "xxx", "stats": {...} }
+                    var replyId = root.TryGetProperty("request_id", out var reqId) ? reqId.GetInt32() :
+                                  root.TryGetProperty("id", out var legacyId) ? legacyId.GetInt32() : 0;
+                    var response = root.TryGetProperty("message", out var resp) ? resp.GetString() ?? "" :
+                                   root.TryGetProperty("response", out var legacyResp) ? legacyResp.GetString() ?? "" : "";
                     var stats = root.TryGetProperty("stats", out var st) ? st : default;
                     ThinkingStateChanged?.Invoke(this, "");
-                    AiResponseReceived?.Invoke(this, new AiResponseEventArgs(id, response));
+                    AiResponseReceived?.Invoke(this, new AiResponseEventArgs(replyId, response));
                     MessageReceived?.Invoke(this, $"[AI] {response}");
                     break;
 
@@ -310,14 +303,25 @@ public class McpBridgeClient : IDisposable
                     ThinkingStateChanged?.Invoke(this, "");
                     break;
 
+                case "stream_token":
+                    // Incremental LLM output: { "type": "stream_token", "content": "<token>" }
+                    if (root.TryGetProperty("content", out var tokenContent))
+                    {
+                        var token = tokenContent.GetString() ?? "";
+                        StreamTokenReceived?.Invoke(this, token);
+                        MessageReceived?.Invoke(this, token);
+                    }
+                    break;
+
                 case "pong":
                     break;
 
                 case "event":
-                    // Game event from plugin (dino tamed, player joined, etc.)
-                    if (root.TryGetProperty("event", out var evt) && root.TryGetProperty("data", out var data))
+                    // Server sends: { "type": "event", "data": { "event": "dino_tamed", ... } }
+                    if (root.TryGetProperty("data", out var data))
                     {
-                        GameEventReceived?.Invoke(this, new GameEventArgs(evt.GetString() ?? "", data.GetRawText()));
+                        var eventName = data.TryGetProperty("event", out var evt) ? evt.GetString() ?? "" : "";
+                        GameEventReceived?.Invoke(this, new GameEventArgs(eventName, data.GetRawText()));
                     }
                     break;
 
