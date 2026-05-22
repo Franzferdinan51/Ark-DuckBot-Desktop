@@ -1,15 +1,15 @@
 ; =============================================
-; RustPlusDesk Installer (Production)
+; ArkDuckBot Desktop Installer (Production)
 ; Fixes uninstall + supports upgrades
 ; =============================================
 
-#define MyAppName      "RustPlusDesk"
-#define MyAppVersion   "5.1.0"
-#define MyAppPublisher "Pronwan" 
-#define MyAppURL       "https://github.com/Pronwan/rustplus-desktop"
-#define MyAppExeName   "RustPlusDesk.exe"
-; 🔴 ORIGINAL-ID 
-#define MyAppId        "{{E8E0C4C1-2E2F-4D2D-9BE7-3B19F0C1ABCD}}"
+#define MyAppName      "ArkDuckBot Desktop"
+#define MyAppVersion   "1.0.0"
+#define MyAppPublisher "Franz Ferdinand"
+#define MyAppURL       "https://github.com/Franzferdinan51/Ark-DuckBot-Desktop"
+#define MyAppExeName   "ArkDuckBot.exe"
+; New App ID for ARK DuckBot
+#define MyAppId        "{{D9F1D5D2-3F3G-5E3E-AC8F-4C20G1D2BCDE}}"
 
 [Setup]
 AppId={#MyAppId}
@@ -20,19 +20,17 @@ AppPublisherURL={#MyAppURL}
 DefaultDirName={autopf}\{#MyAppName}
 DefaultGroupName={#MyAppName}
 
-; Jawads Stabilitäts-Features
 UsePreviousAppDir=yes
 UsePreviousGroup=yes
 CreateUninstallRegKey=yes
 OutputDir=..\bin\Installer
-OutputBaseFilename=RustPlusDesk-Setup
+OutputBaseFilename=ArkDuckBot-Setup
 Compression=lzma2/max
 SolidCompression=yes
 ArchitecturesInstallIn64BitMode=x64
 DisableProgramGroupPage=yes
 
-; Deine Optik
-SetupIconFile=..\Assets\rustplus-desktop-icon.ico
+SetupIconFile=..\Assets\arkduckbot-icon.ico
 WizardImageFile=..\Assets\Images\installer.png
 UninstallDisplayIcon={app}\{#MyAppExeName}
 PrivilegesRequired=admin
@@ -41,10 +39,10 @@ PrivilegesRequired=admin
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked
 
 [Files]
-; 1. Alle Hauptdateien (DLLs, EXE, cash.wav, etc.) aus dem Release-Ordner
+; 1. Main files (DLLs, EXE, cash.wav, etc.) from Release folder
 Source: "..\bin\Installer\publish\*"; DestDir: "{app}"; Flags: ignoreversion
 
-; 2. Die Unterordner direkt aus dem Release-Verzeichnis
+; 2. Subdirectories from Release folder
 Source: "..\bin\Installer\publish\Assets\*";    DestDir: "{app}\Assets";    Flags: ignoreversion recursesubdirs createallsubdirs
 Source: "..\bin\Installer\publish\runtime\*";   DestDir: "{app}\runtime";   Flags: ignoreversion recursesubdirs createallsubdirs
 
@@ -61,14 +59,13 @@ Type: filesandordirs; Name: "{app}\runtime"
 Type: filesandordirs; Name: "{app}\Assets"
 
 [Code]
-// Jawads Aufräum-Logik (Sehr nützlich!)
 procedure DeleteOldBrokenUninstallers;
 var Key: string;
 begin
-  Key := 'Software\Microsoft\Windows\CurrentVersion\Uninstall\RustPlusDesk';
+  Key := 'Software\Microsoft\Windows\CurrentVersion\Uninstall\ArkDuckBot Desktop';
   RegDeleteKeyIncludingSubkeys(HKLM, Key);
   RegDeleteKeyIncludingSubkeys(HKCU, Key);
-  Key := 'Software\WOW6432Node\Microsoft\Windows\CurrentVersion\Uninstall\RustPlusDesk';
+  Key := 'Software\WOW6432Node\Microsoft\Windows\CurrentVersion\Uninstall\ArkDuckBot Desktop';
   RegDeleteKeyIncludingSubkeys(HKLM, Key);
 end;
 

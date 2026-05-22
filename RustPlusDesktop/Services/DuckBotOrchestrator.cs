@@ -43,8 +43,8 @@ public class DuckBotOrchestrator : IDisposable
 
     public DuckBotOrchestrator()
     {
-        _tools = new DuckBotTools();
-        _agent = new DuckBotAgent(_tools);
+        _agent = new DuckBotAgent();
+        _tools = new DuckBotTools(_agent);
         _aiService = new DuckBotAiService(_agent, _tools);
         _skills = new DuckBotSkills();
         _handler = new DuckBotHandler();

@@ -5,7 +5,7 @@
 		<Nullable>enable</Nullable>
 		<UseWPF>true</UseWPF>
 		<UseWindowsForms>true</UseWindowsForms>
-		<ApplicationIcon>Assets\rustplus-desktop-icon.ico</ApplicationIcon>
+		<ApplicationIcon>Assets\arkduckbot-icon.ico</ApplicationIcon>
 
 		<!-- Fixes for Single-File Publish and Cleanup -->
 		<SatelliteResourceLanguages>en</SatelliteResourceLanguages>
@@ -14,15 +14,7 @@
 		<EnableCompressionInSingleFile>true</EnableCompressionInSingleFile>
 	</PropertyGroup>
 	<ItemGroup>
-
 	  <Compile Remove="RustPlusClientStub.cs" />
-	  <Compile Remove="Services\DuckBotAgent.cs" />
-	  <Compile Remove="Services\DuckBotAiService.cs" />
-	  <Compile Remove="Services\DuckBotHandler.cs" />
-	  <Compile Remove="Services\DuckBotKnowledge.cs" />
-	  <Compile Remove="Services\DuckBotOrchestrator.cs" />
-	  <Compile Remove="Services\DuckBotSkills.cs" />
-	  <Compile Remove="Services\DuckBotTools.cs" />
 	</ItemGroup>
 
 	<PropertyGroup>
@@ -147,7 +139,7 @@
 	  <None Remove="Assets\Data\ark-item-list.json" />
 	  <None Remove="Assets\icons\discord.png" />
 	  <None Remove="Assets\Images\RustPlus_V5_Thumbnail.jpg" />
-	  <None Remove="Assets\rustplus-desktop-icon.ico" />
+	  <None Remove="Assets\arkduckbot-icon.ico" />
 	  <None Remove="Assets\Data\ark_items.json" />
 	  <None Remove="Assets\Screenshots\3.0_1.png" />
 	  <None Remove="Assets\Screenshots\3.0_2.png" />
@@ -217,7 +209,7 @@
 	  <Content Include="Assets\1-76fc6c7e.ico">
 	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 	  </Content>
-	  <Content Include="Assets\rustplus-desktop-icon.ico">
+	  <Content Include="Assets\arkduckbot-icon.ico">
 	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 	  </Content>
 	</ItemGroup>
@@ -311,7 +303,7 @@
     <Resource Include="Assets\Data\ark-item-list.json" />
     <Resource Include="Assets\icons\discord.png" />
     <Resource Include="Assets\Images\RustPlus_V5_Thumbnail.jpg" />
-    <Resource Include="Assets\rustplus-desktop-icon.ico" />
+    <Resource Include="Assets\arkduckbot-icon.ico" />
     <Resource Include="Assets\Screenshots\3.0_1.png" />
     <Resource Include="Assets\Screenshots\3.0_2.png" />
     <Resource Include="Assets\Screenshots\3.0_3.png" />

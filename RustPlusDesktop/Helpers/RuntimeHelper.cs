@@ -57,7 +57,27 @@ namespace ArkDuckBot.Helpers
                 if (File.Exists(p3)) return p3;
             }
 
-            // 5) Debug Fallback: Deep search up for project root
+            // 5) Fall back to Node on PATH when the packaged runtime is missing.
+            try
+            {
+                var pathEnv = Environment.GetEnvironmentVariable("PATH");
+                if (!string.IsNullOrWhiteSpace(pathEnv))
+                {
+                    foreach (var segment in pathEnv.Split(Path.PathSeparator))
+                    {
+                        if (string.IsNullOrWhiteSpace(segment)) continue;
+                        try
+                        {
+                            var candidate = Path.Combine(segment.Trim(), "node.exe");
+                            if (File.Exists(candidate)) return candidate;
+                        }
+                        catch { }
+                    }
+                }
+            }
+            catch { }
+
+            // 6) Debug fallback: Deep search up for project root
             try
             {
                 var cur = AppContext.BaseDirectory;
@@ -99,7 +119,8 @@ namespace ArkDuckBot.Helpers
                 msg += $"\n- {Path.Combine(b, "runtime\\node-win-x64\\node.exe")}";
             }
 
-            msg += "\n\nPlease ensure that Google Chrome or Microsoft Edge is installed and the 'runtime' folder exists in the application directory.";
+            msg += "\n- node.exe on PATH";
+            msg += "\n\nPlease ensure that Google Chrome or Microsoft Edge is installed and either the packaged runtime exists or Node.js is available on PATH.";
             
             return msg;
         }
@@ -112,7 +133,10 @@ namespace ArkDuckBot.Helpers
 
             // 1) Suche nach ZIP
             var zip = Path.Combine(AppContext.BaseDirectory, "runtime", "ark-cli.zip");
-            
+            var alternateZip = Path.Combine(AppContext.BaseDirectory, "runtime", "rustplus-cli.zip");
+            if (!File.Exists(zip) && File.Exists(alternateZip))
+                zip = alternateZip;
+             
             // Fallback für Single-File
             if (!File.Exists(zip))
             {
@@ -123,7 +147,12 @@ namespace ArkDuckBot.Helpers
                     {
                         var exeDir = Path.GetDirectoryName(processPath);
                         if (!string.IsNullOrEmpty(exeDir))
+                        {
                             zip = Path.Combine(exeDir, "runtime", "ark-cli.zip");
+                            var alt = Path.Combine(exeDir, "runtime", "rustplus-cli.zip");
+                            if (!File.Exists(zip) && File.Exists(alt))
+                                zip = alt;
+                        }
                     }
                 }
                 catch { }
@@ -163,7 +192,8 @@ namespace ArkDuckBot.Helpers
                 Path.Combine(root, "cli.js"),
                 Path.Combine(root, "ark.js"),
                 Path.Combine(root, "index.js"),
-                Path.Combine(root, "node_modules", "@liamcottle", "ark.js", "cli", "index.js")
+                Path.Combine(root, "node_modules", "@liamcottle", "ark.js", "cli", "index.js"),
+                Path.Combine(root, "node_modules", "@liamcottle", "rustplus.js", "cli", "index.js")
             })
             {
                 if (File.Exists(c)) return c;

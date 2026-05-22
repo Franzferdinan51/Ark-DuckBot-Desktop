@@ -107,7 +107,7 @@ public class DuckBotAiService : IDisposable
             var dinoName = ExtractDinoName(intent.Entities);
             if (!string.IsNullOrEmpty(dinoName))
             {
-                var stats = await _tools.InvokeToolAsync("dino_stats",
+                var stats = await _agent.InvokeToolAsync("dino_stats",
                     new Dictionary<string, object> { { "dino_name", dinoName } },
                     context.Tier);
                 return FormatDinoResponse(dinoName, stats);
@@ -120,7 +120,7 @@ public class DuckBotAiService : IDisposable
             var playerName = ExtractPlayerName(intent.Entities);
             if (!string.IsNullOrEmpty(playerName))
             {
-                var info = await _tools.InvokeToolAsync("player_info",
+                var info = await _agent.InvokeToolAsync("player_info",
                     new Dictionary<string, object> { { "player_name", playerName } },
                     context.Tier);
                 return FormatPlayerResponse(playerName, info);
@@ -131,7 +131,7 @@ public class DuckBotAiService : IDisposable
         if (lower.Contains("tribe") || lower.Contains("my tribe"))
         {
             var tribeName = context.PlayerTribe ?? "Unknown";
-            var members = await _tools.InvokeToolAsync("tribe_members",
+            var members = await _agent.InvokeToolAsync("tribe_members",
                 new Dictionary<string, object> { { "tribe_name", tribeName } },
                 context.Tier);
             return $"Your tribe '{tribeName}' has these members:\n{members}";
@@ -140,7 +140,7 @@ public class DuckBotAiService : IDisposable
         // Balance queries
         if (lower.Contains("balance") || lower.Contains("money"))
         {
-            var balance = await _tools.InvokeToolAsync("player_balance",
+            var balance = await _agent.InvokeToolAsync("player_balance",
                 new Dictionary<string, object> { { "player_name", context.PlayerName } },
                 context.Tier);
             return $"Your balance: {balance}";
@@ -149,7 +149,7 @@ public class DuckBotAiService : IDisposable
         // Server status
         if (lower.Contains("server") || lower.Contains("status"))
         {
-            var status = await _tools.InvokeToolAsync("server_status", new Dictionary<string, object>(), context.Tier);
+            var status = await _agent.InvokeToolAsync("server_status", new Dictionary<string, object>(), context.Tier);
             return $"Server Status:\n{status}";
         }
 
@@ -167,7 +167,7 @@ public class DuckBotAiService : IDisposable
         if (lower.Contains("teleport") || lower.Contains("go to") || lower.Contains("warp"))
         {
             var target = ExtractTarget(intent.Entities);
-            return await _tools.InvokeToolAsync("teleport_to_player",
+            return await _agent.InvokeToolAsync("teleport_to_player",
                 new Dictionary<string, object> { { "target_player", target } },
                 context.Tier).ToString();
         }
@@ -182,7 +182,7 @@ public class DuckBotAiService : IDisposable
         if (lower.Contains("broadcast") || lower.Contains("announce"))
         {
             var message = ExtractMessage(intent.Entities);
-            return await _tools.InvokeToolAsync("broadcast",
+            return await _agent.InvokeToolAsync("broadcast",
                 new Dictionary<string, object> { { "message", message } },
                 context.Tier).ToString();
         }
@@ -210,7 +210,7 @@ public class DuckBotAiService : IDisposable
         {
             var item = ExtractItemName(intent.Entities);
             var quantity = ExtractQuantity(intent.Entities);
-            return await _tools.InvokeToolAsync("spawn_item",
+            return await _agent.InvokeToolAsync("spawn_item",
                 new Dictionary<string, object> { { "player_name", context.PlayerName }, { "item_name", item }, { "quantity", quantity } },
                 context.Tier).ToString();
         }
@@ -272,7 +272,7 @@ Just talk to me naturally!";
 
         if (level <= 0) level = 120; // Default level
 
-        var result = await _tools.InvokeToolAsync("spawn_dino",
+        var result = await _agent.InvokeToolAsync("spawn_dino",
             new Dictionary<string, object> { { "dino_type", dinoType }, { "level", level }, { "gender", "random" } },
             context.Tier);
 

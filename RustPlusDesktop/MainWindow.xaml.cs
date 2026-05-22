@@ -251,8 +251,8 @@ public partial class MainWindow : ui.FluentWindow
         // ── Wpf.Ui: Apply Fluent dark theme to all controls ───────────────────
         ApplicationThemeManager.Apply(ApplicationTheme.Dark, updateAccent: true);
         
-        if (AppTitleBar != null) AppTitleBar.Title = $"RUST+ DESKTOP v{_updateService.VersionRaw}";
-        this.Title = $"RUST+ DESKTOP v{_updateService.VersionRaw}";
+        if (AppTitleBar != null) AppTitleBar.Title = $"ARK DUCKBOT DESKTOP v{_updateService.VersionRaw}";
+        this.Title = $"ARK DUCKBOT DESKTOP v{_updateService.VersionRaw}";
         if (FindName("TxtVersion") is TextBlock txt)
             txt.Text = $"v{_updateService.VersionRaw}";
         InitCameraUi();
@@ -4586,8 +4586,8 @@ private sealed record MarkerRef(System.Windows.Shapes.Ellipse Dot, double U_DIP,
         base.OnSourceInitialized(e);
 
         // Spätestens hier sollte Windows den Titel im Rahmen akzeptieren
-        if (AppTitleBar != null) AppTitleBar.Title = $"RUST+ DESKTOP v{_updateService.VersionRaw}";
-        this.Title = $"RUST+ DESKTOP v{_updateService.VersionRaw}";
+        if (AppTitleBar != null) AppTitleBar.Title = $"ARK DUCKBOT DESKTOP v{_updateService.VersionRaw}";
+        this.Title = $"ARK DUCKBOT DESKTOP v{_updateService.VersionRaw}";
 
         var hwnd = new WindowInteropHelper(this).Handle;
         _hotkeyMgr = new GlobalHotkeyManager(hwnd);

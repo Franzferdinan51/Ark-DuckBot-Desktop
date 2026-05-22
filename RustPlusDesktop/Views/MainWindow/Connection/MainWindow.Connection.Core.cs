@@ -73,10 +73,10 @@ public partial class MainWindow
 
     private void BtnAddServer_Click(object sender, RoutedEventArgs e)
     {
-        var host = Microsoft.VisualBasic.Interaction.InputBox("Server IP/Host:", "Server hinzufügen", "127.0.0.1");
-        var portStr = Microsoft.VisualBasic.Interaction.InputBox("Companion-Port:", "Server hinzufügen", "28082");
-        var token = Microsoft.VisualBasic.Interaction.InputBox("Player-Token (Rust+):", "Server hinzufügen", "");
-        var proxy = Microsoft.VisualBasic.Interaction.InputBox("Facepunch-Proxy verwenden? (y/n)", "Server hinzufügen", "n");
+        var host = Microsoft.VisualBasic.Interaction.InputBox("Server IP/Host:", "Add Server", "127.0.0.1");
+        var portStr = Microsoft.VisualBasic.Interaction.InputBox("Companion-Port:", "Add Server", "28082");
+        var token = Microsoft.VisualBasic.Interaction.InputBox("Player-Token (DuckBot):", "Add Server", "");
+        var proxy = Microsoft.VisualBasic.Interaction.InputBox("Use proxy? (y/n)", "Add Server", "n");
 
         if (int.TryParse(portStr, out var port) && !string.IsNullOrWhiteSpace(host) && !string.IsNullOrWhiteSpace(token))
         {
