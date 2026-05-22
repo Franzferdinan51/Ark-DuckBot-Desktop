@@ -9,6 +9,7 @@ namespace ArkDuckBot.Views
 
         public string McpHost { get; set; } = "localhost";
         public string McpPort { get; set; } = "8443";
+        public string AdminPort { get; set; } = "8444";
         public string AiProvider { get; set; } = "openrouter";
 
         public SettingsModal()
@@ -31,10 +32,12 @@ namespace ArkDuckBot.Views
             // Load MCP settings
             McpHost = TrackingService.McpHost ?? "localhost";
             McpPort = (TrackingService.McpPort ?? 8443).ToString();
+            AdminPort = (TrackingService.AdminPort ?? 8444).ToString();
             AiProvider = TrackingService.AiProvider ?? "openrouter";
 
             TxtMcpHost.Text = McpHost;
             TxtMcpPort.Text = McpPort;
+            TxtAdminPort.Text = AdminPort;
 
             // Load saved shared secret (PasswordBox can't be bound, set in code)
             var savedSecret = TrackingService.McpSecret;
@@ -78,6 +81,16 @@ namespace ArkDuckBot.Views
             }
             TrackingService.McpHost = McpHost;
             UpdateMcpStatus();
+        }
+
+        private void OnAdminPortChanged(object sender, System.Windows.Controls.TextChangedEventArgs e)
+        {
+            if (!_isInitialized) return;
+
+            if (int.TryParse(TxtAdminPort.Text, out var port))
+            {
+                TrackingService.AdminPort = port;
+            }
         }
 
         private void OnMcpSecretChanged(object sender, System.Windows.RoutedEventArgs e)

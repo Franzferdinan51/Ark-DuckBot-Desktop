@@ -107,6 +107,7 @@ public class TrackingSettings
     public Dictionary<string, int> LearnedQueryPorts { get; set; } = new();
     public string? McpHost { get; set; } = "localhost";
     public int McpPort { get; set; } = 8443;
+    public int AdminPort { get; set; } = 8444;
     public string? McpSecret { get; set; } = "";
     public string? AiProvider { get; set; } = "openrouter";
 }
@@ -533,6 +534,12 @@ public static class TrackingService
     {
         get => _settings.McpPort > 0 ? _settings.McpPort : 8443;
         set { _settings.McpPort = value; SaveDB(); }
+    }
+
+    public static int AdminPort
+    {
+        get => _settings.AdminPort > 0 ? _settings.AdminPort : 8444;
+        set { _settings.AdminPort = value; SaveDB(); }
     }
 
     public static string? McpSecret
