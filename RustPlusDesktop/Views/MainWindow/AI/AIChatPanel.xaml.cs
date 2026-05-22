@@ -6,9 +6,12 @@ namespace ArkDuckBot.Views.MainWindow.AI;
 
 public partial class AIChatPanel : UserControl
 {
+    private AiChatViewModel? _viewModel;
+
     public AIChatPanel()
     {
         InitializeComponent();
+        _viewModel = DataContext as AiChatViewModel;
         PromptInput.KeyDown += (s, e) =>
         {
             if (e.Key == Key.Enter && !Keyboard.Modifiers.HasFlag(ModifierKeys.Shift))
@@ -21,5 +24,10 @@ public partial class AIChatPanel : UserControl
                 }
             }
         };
+    }
+
+    public void Initialize(McpBridgeClient client)
+    {
+        _viewModel?.Initialize(client);
     }
 }
