@@ -484,7 +484,8 @@ public class DuckBotTools : IDisposable
 
         try
         {
-            var command = FormatToolAsCommand(tool, args);
+            var dict = ObjectToDictionary(args);
+            var command = FormatToolAsCommand(tool, dict);
             await _mcpBridge.SendChatMessageAsync(command);
             return $"Executed: {tool}";
         }
@@ -492,6 +493,17 @@ public class DuckBotTools : IDisposable
         {
             return $"Error: {ex.Message}";
         }
+    }
+
+    private static Dictionary<string, object> ObjectToDictionary(object obj)
+    {
+        var dict = new Dictionary<string, object>();
+        if (obj == null) return dict;
+        foreach (var prop in obj.GetType().GetProperties())
+        {
+            dict[prop.Name] = prop.GetValue(obj) ?? "";
+        }
+        return dict;
     }
 
     private string FormatToolAsCommand(string tool, Dictionary<string, object> args)

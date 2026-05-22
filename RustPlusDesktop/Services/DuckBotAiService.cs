@@ -130,7 +130,7 @@ public class DuckBotAiService : IDisposable
         // Tribe queries
         if (lower.Contains("tribe") || lower.Contains("my tribe"))
         {
-            var tribeName = context.PlayerTribe ?? "Unknown";
+            var tribeName = context.TribeId ?? "Unknown";
             var members = await _agent.InvokeToolAsync("tribe_members",
                 new Dictionary<string, object> { { "tribe_name", tribeName } },
                 context.Tier);
@@ -167,9 +167,10 @@ public class DuckBotAiService : IDisposable
         if (lower.Contains("teleport") || lower.Contains("go to") || lower.Contains("warp"))
         {
             var target = ExtractTarget(intent.Entities);
-            return await _agent.InvokeToolAsync("teleport_to_player",
+            var tpResult = await _agent.InvokeToolAsync("teleport_to_player",
                 new Dictionary<string, object> { { "target_player", target } },
-                context.Tier).ToString();
+                context.Tier);
+            return tpResult?.ToString() ?? "Teleport command sent.";
         }
 
         // Home commands
@@ -182,9 +183,10 @@ public class DuckBotAiService : IDisposable
         if (lower.Contains("broadcast") || lower.Contains("announce"))
         {
             var message = ExtractMessage(intent.Entities);
-            return await _agent.InvokeToolAsync("broadcast",
+            var bcResult = await _agent.InvokeToolAsync("broadcast",
                 new Dictionary<string, object> { { "message", message } },
-                context.Tier).ToString();
+                context.Tier);
+            return bcResult?.ToString() ?? "Broadcast sent.";
         }
 
         return "I'm not sure what command you want me to run. Try being more specific!";
@@ -210,9 +212,10 @@ public class DuckBotAiService : IDisposable
         {
             var item = ExtractItemName(intent.Entities);
             var quantity = ExtractQuantity(intent.Entities);
-            return await _agent.InvokeToolAsync("spawn_item",
+            var itemResult = await _agent.InvokeToolAsync("spawn_item",
                 new Dictionary<string, object> { { "player_name", context.PlayerName }, { "item_name", item }, { "quantity", quantity } },
-                context.Tier).ToString();
+                context.Tier);
+            return itemResult?.ToString() ?? $"Gave {quantity}x {item}.";
         }
 
         return "I can spawn dinos and items for you! Just say 'spawn me a Rex level 150'";

@@ -41,7 +41,7 @@ public class DuckBotHandler : IDisposable
             _commandQueue.TryDequeue(out _);
         }
 
-        _commandQueue.TryEnqueue(cmd);
+        _commandQueue.Enqueue(cmd);
         CommandEnqueued?.Invoke(this, $"[{cmd.Id}] {action}");
         return await Task.FromResult(true);
     }
