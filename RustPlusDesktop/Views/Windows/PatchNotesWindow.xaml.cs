@@ -1,0 +1,36 @@
+using System.Windows;
+
+namespace ArkDuckBot.Views
+{
+    public partial class PatchNotesWindow : Window
+    {
+        public PatchNotesWindow()
+        {
+            InitializeComponent();
+        }
+
+        private void Hyperlink_RequestNavigate(object sender, System.Windows.Navigation.RequestNavigateEventArgs e)
+        {
+            try
+            {
+                System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo
+                {
+                    FileName = e.Uri.AbsoluteUri,
+                    UseShellExecute = true
+                });
+                e.Handled = true;
+            }
+            catch { /* Fehler beim Öffnen des Browsers abfangen */ }
+        }
+
+        private void TrackingLink_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                HowToTrackWindow.Show(this.Owner ?? this);
+                this.Close();
+            }
+            catch { }
+        }
+    }
+}
