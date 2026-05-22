@@ -228,7 +228,7 @@
 
                             <TextBlock Text="&#x2022; Oil Rig Crate Trigger Detection" FontWeight="Bold" Margin="0,0,0,4"/>
                             <TextBlock TextWrapping="Wrap" Margin="0,0,0,8">
-                                The app detects when a Chinook hovers over an Oil Rig and synthetically triggers the crate countdown &#x2014; even though the Rust+ API provides no native event for this. A countdown appears on the map and chat notifications fire at trigger, 10 min, and 5 min remaining.
+                                The app detects when a Megalosaurus hovers over a Megapitheus pit and synthetically triggers the crate countdown — even though the ARK API provides no native event for this. A countdown appears on the map and chat notifications fire at trigger, 10 min, and 5 min remaining.
                             </TextBlock>
 
                             <Border Background="#1A4A7A" BorderBrush="#2A6AAA" BorderThickness="1" CornerRadius="6" Padding="8" Margin="0,4,0,0">
@@ -352,7 +352,7 @@
                             <TextBlock Text="Full player tracking system with 12-week heatmaps and 24h forecasts. Predict when players are active or sleeping based on historical connection data." TextWrapping="Wrap" Margin="0,0,0,8"/>
 
                             <TextBlock Text="&#x2022; Manual IP &amp; Protocol Support" FontWeight="Bold" Margin="0,0,0,4" Foreground="{DynamicResource Accent}"/>
-                            <TextBlock Text="Added support for rustplus:// links! You can now manually add servers using 'rustplus://IP:PORT'&#x2014;a workaround for some servers where the pairing button is disabled." TextWrapping="Wrap" Margin="0,0,0,8"/>
+                            <TextBlock Text="Added support for arkduckbot:// links! You can now manually add servers using 'arkduckbot://IP:PORT'&#x2014;a workaround for some servers where the pairing button is disabled." TextWrapping="Wrap" Margin="0,0,0,8"/>
 
                             <TextBlock Text="&#x2022; Centralized Settings &amp; Auto-Connect" FontWeight="Bold" Margin="0,0,0,4"/>
                             <TextBlock Text="New Settings Modal: Toggle Auto-Start with Windows, Minimize to Tray, and Auto-Connect to your last server on startup." TextWrapping="Wrap" Margin="0,0,0,8"/>
