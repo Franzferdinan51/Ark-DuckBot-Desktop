@@ -1,4 +1,4 @@
-using RustPlusDesk.Models;
+using ArkDuckBot.Models;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -15,7 +15,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 
-namespace RustPlusDesk.Views;
+namespace ArkDuckBot.Views;
 
 public partial class MainWindow
 {
@@ -420,7 +420,7 @@ private bool _overlayToolsVisible = false;
     {
         var baseDir = System.IO.Path.Combine(
             Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
-            "RustPlusDesk",
+            "ArkDuckBot",
             "Overlays",
             GetServerKey()
         );
@@ -1677,7 +1677,7 @@ private void SaveOwnOverlayToJson()
     {
         var baseDir = System.IO.Path.Combine(
             Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
-            "RustPlusDesk",
+            "ArkDuckBot",
             "Overlays",
             GetServerKey()
         );
@@ -1839,7 +1839,7 @@ private void SaveOwnOverlayToJson()
         return data;
     }
 
-    // speichert OverlaySaveData von steamId (z.B. teammate) lokal in %APPDATA%\RustPlusDesk\Overlays\<serverKey>\<steamId>.json
+    // speichert OverlaySaveData von steamId (z.B. teammate) lokal in %APPDATA%\ArkDuckBot\Overlays\<serverKey>\<steamId>.json
     private void WriteOverlaySaveDataLocal(ulong steamId, OverlaySaveData data)
     {
         var json = System.Text.Json.JsonSerializer.Serialize(

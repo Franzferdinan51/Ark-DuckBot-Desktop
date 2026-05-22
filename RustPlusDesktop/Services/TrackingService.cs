@@ -140,13 +140,13 @@ public static class TrackingService
 
     private static readonly string _fcmConfigPath = Path.Combine(
         Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
-        "ArkDuckBot", "rustplusjs-config.json");
+        "ArkDuckBot", "arkjs-config.json");
 
     public static bool IsFcmConfigured()
         => File.Exists(_fcmConfigPath) && new FileInfo(_fcmConfigPath).Length > 50;
 
     /// <summary>
-    /// Reads steam_id, issue_date, expiry_date from rustplusjs-config.json and seeds
+    /// Reads steam_id, issue_date, expiry_date from arkjs-config.json and seeds
     /// the in-memory TrackingSettings if those values are missing.  Call this on startup
     /// and after every pairing event.
     /// </summary>
@@ -190,7 +190,7 @@ public static class TrackingService
     }
 
     /// <summary>
-    /// Patches only the steam_id field in rustplusjs-config.json without
+    /// Patches only the steam_id field in arkjs-config.json without
     /// touching the rest of the file.  Safe to call after pairing.
     /// </summary>
     public static void PatchFcmConfigSteamId(string steamId)

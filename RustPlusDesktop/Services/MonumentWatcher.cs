@@ -64,7 +64,7 @@ namespace ArkDuckBot.Services
 
         public bool HasAnyMonument => HasSmallOil || HasLargeOil;
 
-        public void SetMonuments(List<RustPlusClientReal.DynMarker> monuments)
+        public void SetMonuments(List<ArkClientReal.DynMarker> monuments)
         {
             foreach (var m in monuments)
             {
@@ -76,9 +76,9 @@ namespace ArkDuckBot.Services
             }
         }
 
-        public List<RustPlusClientReal.DynMarker> UpdateAndGetVirtualMarkers(List<RustPlusClientReal.DynMarker> currentMarkers, HashSet<uint> ignoredKnownIds)
+        public List<ArkClientReal.DynMarker> UpdateAndGetVirtualMarkers(List<ArkClientReal.DynMarker> currentMarkers, HashSet<uint> ignoredKnownIds)
         {
-            var virtualMarkers = new List<RustPlusClientReal.DynMarker>();
+            var virtualMarkers = new List<ArkClientReal.DynMarker>();
             var now = DateTime.UtcNow;
 
             if (HasAnyMonument)
@@ -174,7 +174,7 @@ namespace ArkDuckBot.Services
                 uint vId = 0xB0000000 | (uint)rigName.GetHashCode();
                 string timeStr = $"{(int)minutesLeft}:{timeLeft.Seconds:D2}";
 
-                virtualMarkers.Add(new RustPlusClientReal.DynMarker(
+                virtualMarkers.Add(new ArkClientReal.DynMarker(
                     id: vId,
                     type: VIRTUAL_CRATE_TYPE,
                     kind: "Locked Crate",
@@ -191,7 +191,7 @@ namespace ArkDuckBot.Services
             return virtualMarkers;
         }
 
-        private void CheckAndTriggerHover(RustPlusClientReal.DynMarker chinook, ChinookState state, (double X, double Y)? rigPos, string rigName, DateTime now)
+        private void CheckAndTriggerHover(ArkClientReal.DynMarker chinook, ChinookState state, (double X, double Y)? rigPos, string rigName, DateTime now)
         {
             if (rigPos == null) return;
 
@@ -227,7 +227,7 @@ namespace ArkDuckBot.Services
             }
         }
         
-        private void CheckAndTriggerTrajectory(RustPlusClientReal.DynMarker chinook, ChinookState state, (double X, double Y)? rigPos, string rigName, DateTime now)
+        private void CheckAndTriggerTrajectory(ArkClientReal.DynMarker chinook, ChinookState state, (double X, double Y)? rigPos, string rigName, DateTime now)
         {
             if (rigPos == null || state.TrajectoryTriggered) return;
 

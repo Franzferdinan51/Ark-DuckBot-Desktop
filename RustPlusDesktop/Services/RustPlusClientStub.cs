@@ -7,12 +7,12 @@ using ArkDuckBot.Models;
 
 namespace ArkDuckBot.Services;
 
-public class RustPlusClientStub : IRustPlusClient
+public class ArkClientStub : IArkClient
 {
     private readonly Action<string> _log;
     private ClientWebSocket? _ws;
 
-    public RustPlusClientStub(Action<string> log) => _log = log;
+    public ArkClientStub(Action<string> log) => _log = log;
 
     public async Task ConnectAsync(ServerProfile profile, CancellationToken ct = default)
     {

@@ -98,7 +98,7 @@ public partial class MainWindow
 
     private async Task<bool> SendTeamChatReliableAsync(string text)
     {
-        if (_rust is not RustPlusClientReal real) return false;
+        if (_rust is not ArkClientReal real) return false;
         
         if (text == null)
         {
@@ -225,7 +225,7 @@ public partial class MainWindow
 
         if (isCommand)
         {
-            if (!isHistorical && _rust is RustPlusClientReal real)
+            if (!isHistorical && _rust is ArkClientReal real)
             {
                 _ = ProcessChatCommands(m);
             }
@@ -243,7 +243,7 @@ public partial class MainWindow
         return true;
     }
 
-    private void OnTeamChatReceived(object? _, RustPlusDesk.Models.TeamChatMessage m)
+    private void OnTeamChatReceived(object? _, ArkDuckBot.Models.TeamChatMessage m)
     {
         Dispatcher.Invoke(() => AddIncomingChatMessage(m.Author, m.Text, m.Timestamp));
     }
@@ -257,7 +257,7 @@ public partial class MainWindow
 
     private async void BtnToggleChat_Click(object sender, RoutedEventArgs e)
     {
-        if (_rust is not RustPlusClientReal real)
+        if (_rust is not ArkClientReal real)
         {
             ShowInfoSnackbar("Connection", "You are not connected to any server.", ui.ControlAppearance.Caution);
             return;

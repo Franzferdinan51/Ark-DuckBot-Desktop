@@ -85,7 +85,7 @@
                             <TextBlock Text="v5.0.0 |  The Game Changer Update (May 15, 2026)" FontWeight="SemiBold" FontSize="16" Margin="0,0,0,4" Foreground="{DynamicResource Accent}"/>
                             
                             <!-- Thumbnail -->
-                            <Image Source="pack://application:,,,/Assets/Images/RustPlus_V5_Thumbnail.jpg" Stretch="Uniform" MaxHeight="380" Margin="0,4,0,12" />
+                            <Image Source="pack://application:,,,/Assets/Images/Ark_V5_Thumbnail.jpg" Stretch="Uniform" MaxHeight="380" Margin="0,4,0,12" />
 
                             <!-- Features -->
                             <TextBlock Text="&#x2022; Integrated Auto-Update System &amp; Runtime Management" FontWeight="Bold" Margin="0,0,0,4" Foreground="{DynamicResource Accent}"/>

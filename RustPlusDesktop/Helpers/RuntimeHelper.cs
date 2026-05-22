@@ -107,11 +107,11 @@ namespace ArkDuckBot.Helpers
         public static string EnsureCliUnpackedRoot()
         {
             var target = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-                                      "ArkDuckBot", "runtime", "rustplus-cli");
+                                      "ArkDuckBot", "runtime", "ark-cli");
             Directory.CreateDirectory(target);
 
             // 1) Suche nach ZIP
-            var zip = Path.Combine(AppContext.BaseDirectory, "runtime", "rustplus-cli.zip");
+            var zip = Path.Combine(AppContext.BaseDirectory, "runtime", "ark-cli.zip");
             
             // Fallback für Single-File
             if (!File.Exists(zip))
@@ -123,7 +123,7 @@ namespace ArkDuckBot.Helpers
                     {
                         var exeDir = Path.GetDirectoryName(processPath);
                         if (!string.IsNullOrEmpty(exeDir))
-                            zip = Path.Combine(exeDir, "runtime", "rustplus-cli.zip");
+                            zip = Path.Combine(exeDir, "runtime", "ark-cli.zip");
                     }
                 }
                 catch { }
@@ -148,10 +148,10 @@ namespace ArkDuckBot.Helpers
 
             // 2) Debug-Fallback: ungezippter Ordner im Projekt
             var dev = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "..", "..", "..",
-                                                    "runtime", "rustplus-cli"));
+                                                    "runtime", "ark-cli"));
             if (Directory.Exists(dev)) return dev;
 
-            throw new FileNotFoundException("rustplus-cli not found (neither ZIP in output nor Dev Folder).\nSearched ZIP at: " + zip);
+            throw new FileNotFoundException("ark-cli not found (neither ZIP in output nor Dev Folder).\nSearched ZIP at: " + zip);
         }
 
         public static string? ResolveCliEntry(out string workingDir)
@@ -161,9 +161,9 @@ namespace ArkDuckBot.Helpers
 
             foreach (var c in new[] {
                 Path.Combine(root, "cli.js"),
-                Path.Combine(root, "rustplus.js"),
+                Path.Combine(root, "ark.js"),
                 Path.Combine(root, "index.js"),
-                Path.Combine(root, "node_modules", "@liamcottle", "rustplus.js", "cli", "index.js")
+                Path.Combine(root, "node_modules", "@liamcottle", "ark.js", "cli", "index.js")
             })
             {
                 if (File.Exists(c)) return c;
@@ -176,7 +176,7 @@ namespace ArkDuckBot.Helpers
             // wir brauchen den Ordner, der die *node_modules* enthält
             var root = EnsureCliUnpackedRoot();
             
-            if (Directory.Exists(Path.Combine(root, "node_modules", "@liamcottle", "rustplus.js")))
+            if (Directory.Exists(Path.Combine(root, "node_modules", "@liamcottle", "ark.js")))
                 return root;
             
             return null;

@@ -1,4 +1,4 @@
-using RustPlusDesk.Services;
+using ArkDuckBot.Services;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,7 +15,7 @@ using System.Windows.Media.Animation;
 using System.Windows.Media.Imaging;
 using System.Text.RegularExpressions;
 
-namespace RustPlusDesk.Views;
+namespace ArkDuckBot.Views;
 
 public partial class MainWindow
 {
@@ -163,7 +163,7 @@ public partial class MainWindow
 
     private async Task LoadMapAsync()
     {
-        if (_rust is not RustPlusClientReal real) return;
+        if (_rust is not ArkClientReal real) return;
 
         var map = await real.GetMapWithMonumentsAsync();
         if (map == null) { AppendLog("Map: no data received."); return; }
@@ -250,7 +250,7 @@ public partial class MainWindow
         _showPlayers = (ChkPlayers.IsChecked != false);
         foreach (var kv in _dynEls)
         {
-            if (kv.Value.Tag is RustPlusClientReal.DynMarker dm)
+            if (kv.Value.Tag is ArkClientReal.DynMarker dm)
             {
                 if (dm.Type == 1)
                     kv.Value.Visibility = _showPlayers ? Visibility.Visible : Visibility.Collapsed;
@@ -302,7 +302,7 @@ public partial class MainWindow
         return host;
     }
 
-    private void ProcessCargoDocking(RustPlusClientReal.DynMarker m, bool isGhost = false)
+    private void ProcessCargoDocking(ArkClientReal.DynMarker m, bool isGhost = false)
     {
         if (m.Type != 5) return;
         
@@ -556,7 +556,7 @@ public partial class MainWindow
     private async Task PollDynMarkersOnceAsync()
     {
         if (_isDynPollBusy) return;
-        if (_rust is not RustPlusClientReal real) return;
+        if (_rust is not ArkClientReal real) return;
         if (_worldSizeS <= 0 || _worldRectPx.Width <= 0) return;
 
         _isDynPollBusy = true;
@@ -575,7 +575,7 @@ public partial class MainWindow
             var list = await real.GetDynamicMapMarkersAsync(ctsMarkers.Token);
             var virtualMarkers = _monumentWatcher.UpdateAndGetVirtualMarkers(list, _dynKnown);
 
-            var combinedList = new List<RustPlusClientReal.DynMarker>(list.Count + virtualMarkers.Count);
+            var combinedList = new List<ArkClientReal.DynMarker>(list.Count + virtualMarkers.Count);
             combinedList.AddRange(list);
             combinedList.AddRange(virtualMarkers);
 
@@ -634,7 +634,7 @@ public partial class MainWindow
         public string? ToolTip;
     }
 
-    private RustPlusClientReal.DynMarker GetPersistentEvent(IReadOnlyList<RustPlusClientReal.DynMarker> markers, int type)
+    private ArkClientReal.DynMarker GetPersistentEvent(IReadOnlyList<ArkClientReal.DynMarker> markers, int type)
     {
         var m = markers.FirstOrDefault(m => m.Type == type);
         if (m.Id != 0) return m;
@@ -644,7 +644,7 @@ public partial class MainWindow
         if (entry.Value != null && entry.Value.History.Count > 0)
         {
             var last = entry.Value.History.Last();
-            return new RustPlusClientReal.DynMarker(
+            return new ArkClientReal.DynMarker(
                 entry.Key, 
                 type, 
                 EventKindText(type), 
@@ -659,7 +659,7 @@ public partial class MainWindow
         return default;
     }
 
-    private void UpdateEventDock(IReadOnlyList<RustPlusClientReal.DynMarker> markers)
+    private void UpdateEventDock(IReadOnlyList<ArkClientReal.DynMarker> markers)
     {
         if (EventDock == null) return;
 
@@ -1055,7 +1055,7 @@ public partial class MainWindow
         }
     }
 
-    private void UpdateDynUI(IReadOnlyList<RustPlusClientReal.DynMarker> markers)
+    private void UpdateDynUI(IReadOnlyList<ArkClientReal.DynMarker> markers)
     {
         _announceSpawns = TrackingService.AnnounceSpawnsMaster;
         if (!_v1MarkerResetDone)
@@ -1493,7 +1493,7 @@ public partial class MainWindow
                                 ghostX = cds.LastX;
                                 ghostY = cds.LastY;
                             }
-                            var ghost = new RustPlusClientReal.DynMarker(id, 5, "CargoShip", ghostX, ghostY, "Cargo Ship", null, 0);
+                            var ghost = new ArkClientReal.DynMarker(id, 5, "CargoShip", ghostX, ghostY, "Cargo Ship", null, 0);
                             ProcessCargoDocking(ghost, isGhost: true);
                         }
 
@@ -1659,7 +1659,7 @@ public partial class MainWindow
         }
     }
 
-    private FrameworkElement BuildAnimatedAirVehicleMarker(RustPlusClientReal.DynMarker m)
+    private FrameworkElement BuildAnimatedAirVehicleMarker(ArkClientReal.DynMarker m)
     {
         var grid = new Grid { Width = 128, Height = 128, ClipToBounds = false };
         if (m.Label != null) ToolTipService.SetToolTip(grid, m.Label);

@@ -17,14 +17,14 @@ public partial class MainWindow
 internal readonly HashSet<string> _camBusy = new(StringComparer.OrdinalIgnoreCase);
     private void BtnOpenCamera_Click(object sender, RoutedEventArgs e)
     {
-        if (_rust is not RustPlusClientReal real) return;
+        if (_rust is not ArkClientReal real) return;
 
         // simpler Prompt statt TextBox:
         var id = Microsoft.VisualBasic.Interaction.InputBox(
             "Camera identifier:", "Open camera", "");
         if (string.IsNullOrWhiteSpace(id)) return;
 
-        var w = new RustPlusDesk.Views.CameraWindow(real, id) { Owner = this };
+        var w = new ArkDuckBot.Views.CameraWindow(real, id) { Owner = this };
         w.Show();
         real.DebugDumpAppRequestShape();
     }
@@ -221,9 +221,9 @@ internal readonly HashSet<string> _camBusy = new(StringComparer.OrdinalIgnoreCas
         btnOpen.Content = new TextBlock { FontFamily = new FontFamily("Segoe MDL2 Assets"), Text = "\uE8A7" }; // E894
         btnOpen.Click += (_, __) =>
         {
-            if (_rust is RustPlusClientReal real)
+            if (_rust is ArkClientReal real)
             {
-                var w = new RustPlusDesk.Views.CameraWindow(real, id) { Owner = this };
+                var w = new ArkDuckBot.Views.CameraWindow(real, id) { Owner = this };
                 _camBusy.Add(id);
                 w.Closed += (_, __2) => _camBusy.Remove(id);
                 w.Show();
@@ -277,7 +277,7 @@ internal readonly HashSet<string> _camBusy = new(StringComparer.OrdinalIgnoreCas
     private async void CamThumbTimer_Tick(object? sender, EventArgs e)
     {
         if (!CamItems.IsVisible || _cameraIds.Count == 0) return;
-        if (_rust is not RustPlusClientReal real) return;
+        if (_rust is not ArkClientReal real) return;
         if (System.Threading.Interlocked.Exchange(ref _camThumbBusy, 1) == 1) return;
 
         try

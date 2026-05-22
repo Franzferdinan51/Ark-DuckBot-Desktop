@@ -1,12 +1,12 @@
 using ArkDuckBot.Models;
 using System.Threading;
 using System.Threading.Tasks;
-// using static RustPlusDesk.Services.RustPlusClientReal;
+// using static ArkDuckBot.Services.ArkClientReal;
 
 namespace ArkDuckBot.Services;
 
 
-    public interface IRustPlusClient
+    public interface IArkClient
 {
     Task ConnectAsync(ServerProfile profile, CancellationToken ct = default);
     Task DisconnectAsync();

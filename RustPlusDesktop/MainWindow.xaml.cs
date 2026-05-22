@@ -44,7 +44,7 @@ using System.Windows.Resources; // für Application.GetResourceStream
 using System.Windows.Shapes;
 using System.Windows.Threading;
 using System.Xml.Linq;
-using static ArkDuckBot.Services.RustPlusClientReal;
+using static ArkDuckBot.Services.ArkClientReal;
 using IOPath = System.IO.Path;
 using ArkDuckBot.Helpers;
 using Wpf.Ui;
@@ -62,7 +62,7 @@ public partial class MainWindow : ui.FluentWindow
     private readonly UpdateService _updateService = new();
 
     private DateTime _lastPairingPingAt = DateTime.MinValue;
-    private readonly IRustPlusClient _rust;  // Interface statt fester Klasse
+    private readonly IArkClient _rust;  // Interface statt fester Klasse
     private readonly McpBridgeClient _mcpBridge = new();  // DuckBot MCP Bridge for AI chat
     private WebView2? _webView;
     private IPairingListener _pairing;
@@ -101,7 +101,7 @@ public partial class MainWindow : ui.FluentWindow
     private readonly MonumentWatcher _monumentWatcher = new MonumentWatcher();
 
     private uint? _trackingEntityId; // NEU: ID des Objekts, dem die Kamera folgt
-    private IReadOnlyList<RustPlusClientReal.DynMarker>? _lastMarkers; // Cache für Interaktionen
+    private IReadOnlyList<ArkClientReal.DynMarker>? _lastMarkers; // Cache für Interaktionen
 
     public void StopTracking()
     {
@@ -147,7 +147,7 @@ public partial class MainWindow : ui.FluentWindow
     // Dumper Button
     private async void BtnDynCheck_Click(object sender, RoutedEventArgs e)
     {
-        if (_rust is not RustPlusClientReal real)
+        if (_rust is not ArkClientReal real)
         {
             AppendLog("dyn2: kein Client.");
             return;
@@ -439,9 +439,9 @@ public partial class MainWindow : ui.FluentWindow
         }));
 
 
-        _rust = new RustPlusClientReal(AppendLog);
+        _rust = new ArkClientReal(AppendLog);
 
-        if (_rust is RustPlusClientReal real)
+        if (_rust is ArkClientReal real)
         {
             real.EnsureEventsHooked();
             real.DeviceStateEvent += async (id, isOn, kindFromApi) =>
@@ -978,7 +978,7 @@ public partial class MainWindow : ui.FluentWindow
     private const double SHOP_CARD_WIDTH = 320; // feste Breite deiner Shop-Karte
     private const double SHOP_GAP = 8;   // Abstand zwischen Karten
 
-    // Lokaler Icon-Cache (z.B. %LOCALAPPDATA%\RustPlusDesk\icons)
+    // Lokaler Icon-Cache (z.B. %LOCALAPPDATA%\ArkDuckBot\icons)
     private static readonly string sIconCacheDir =
         System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
                                "ArkDuckBot", "icons");
@@ -1142,7 +1142,7 @@ public partial class MainWindow : ui.FluentWindow
         foreach (var cs in _heliCrashSites) { if (cs.MapElement != null) Overlay?.Children.Remove(cs.MapElement); }
         _heliCrashSites.Clear();
 
-        if (_rust is RustPlusClientReal real)
+        if (_rust is ArkClientReal real)
         {
              // real.Disconnect(); // Nein, wir sharen die Instanz, wir reconnecten erst bei "Connect"
         }
@@ -1287,7 +1287,7 @@ public partial class MainWindow : ui.FluentWindow
             }
         });
     }
-    private Border BuildOfferRowUI(RustPlusClientReal.ShopOrder o)
+    private Border BuildOfferRowUI(ArkClientReal.ShopOrder o)
     {
         bool outOfStock = o.Stock <= 0;
 
@@ -1761,7 +1761,7 @@ public partial class MainWindow : ui.FluentWindow
 
 
     /// <summary>Formatiert eine Shop-Zeile angenehm lesbar.</summary>
-    private static string FormatShopLine(RustPlusClientReal.ShopOrder o)
+    private static string FormatShopLine(ArkClientReal.ShopOrder o)
     {
         var left = $"{ResolveItemName(o.ItemId, o.ItemShortName)} x{o.Quantity}";
         var right = $"{o.CurrencyAmount} {ResolveItemName(o.CurrencyItemId, o.CurrencyShortName)}";
@@ -2135,7 +2135,7 @@ private sealed record MarkerRef(System.Windows.Shapes.Ellipse Dot, double U_DIP,
             if (link.Contains("?") && (link.Contains("address=") || link.Contains("ip=")))
             {
                 // --- FALL A: Offizieller Link (mit Parametern) ---
-                var p = ParseRustPlusLink(link);
+                var p = ParseArkLink(link);
                 host = p.host;
                 port = p.port;
                 playerId = p.playerId != 0 ? p.playerId.ToString() : playerId;
@@ -2186,7 +2186,7 @@ private sealed record MarkerRef(System.Windows.Shapes.Ellipse Dot, double U_DIP,
     }
 
 
-    private (string host, int port, ulong playerId, int playerToken, string? name) ParseRustPlusLink(string link)
+    private (string host, int port, ulong playerId, int playerToken, string? name) ParseArkLink(string link)
     {
         // Beispiele tolerieren:
         // arkduckbot://connect?ip=1.2.3.4&port=27020&playerId=7656…&playerToken=123456
@@ -2392,7 +2392,7 @@ private sealed record MarkerRef(System.Windows.Shapes.Ellipse Dot, double U_DIP,
                 if (string.Equals(dev.Kind, "StorageMonitor", StringComparison.OrdinalIgnoreCase))
                 {
                     // 1) Cache → UI (falls vorhanden), sonst Hülle
-                    if (_rust is RustPlusClientReal rpc && rpc.TryGetCachedStorage(dev.EntityId, out var cached))
+                    if (_rust is ArkClientReal rpc && rpc.TryGetCachedStorage(dev.EntityId, out var cached))
                     {
                         dev.IsMissing = false;
                         Dispatcher.Invoke(() =>
@@ -2421,7 +2421,7 @@ private sealed record MarkerRef(System.Windows.Shapes.Ellipse Dot, double U_DIP,
                         {
                             try
                             {
-                                if (_rust is RustPlusClientReal r2)
+                                if (_rust is ArkClientReal r2)
                                 {
                                     await r2.SubscribeEntityAsync(dev.EntityId);
                                     await r2.PokeEntityAsync(dev.EntityId);
@@ -3333,13 +3333,13 @@ private sealed record MarkerRef(System.Windows.Shapes.Ellipse Dot, double U_DIP,
         _ => "Event"
     };
 
-    private List<RustPlusClientReal.ShopMarker> _lastShops = new(); // füllen wir beim Polling
+    private List<ArkClientReal.ShopMarker> _lastShops = new(); // füllen wir beim Polling
 
     // PATH FINDER WINDOW LOGIK
 
     private FrameworkElement BuildSearchResultCard(
-    RustPlusClientReal.ShopMarker shop,
-    IEnumerable<RustPlusClientReal.ShopOrder> offers)
+    ArkClientReal.ShopMarker shop,
+    IEnumerable<ArkClientReal.ShopOrder> offers)
     {
         var border = new Border
         {
@@ -3783,21 +3783,21 @@ private sealed record MarkerRef(System.Windows.Shapes.Ellipse Dot, double U_DIP,
         );
     }
 
-    private bool MatchOrderLeft(RustPlusClientReal.ShopOrder o, string q)
+    private bool MatchOrderLeft(ArkClientReal.ShopOrder o, string q)
     {
         if (string.IsNullOrEmpty(q)) return true;
         var name = ResolveItemName(o.ItemId, o.ItemShortName);
         return name.Contains(q, StringComparison.OrdinalIgnoreCase);
     }
 
-    private bool MatchOrderRight(RustPlusClientReal.ShopOrder o, string q)
+    private bool MatchOrderRight(ArkClientReal.ShopOrder o, string q)
     {
         if (string.IsNullOrEmpty(q)) return true;
         var name = ResolveItemName(o.CurrencyItemId, o.CurrencyShortName);
         return name.Contains(q, StringComparison.OrdinalIgnoreCase);
     }
 
-    private async Task CheckAlerts(IReadOnlyList<RustPlusClientReal.ShopMarker> shops)
+    private async Task CheckAlerts(IReadOnlyList<ArkClientReal.ShopMarker> shops)
     {
         foreach (var rule in _alertRules)
         {
@@ -3911,7 +3911,7 @@ private sealed record MarkerRef(System.Windows.Shapes.Ellipse Dot, double U_DIP,
     }
     // ─── ONLINE PLAYERS & TRACKING ───────────────────────────────────────────
 
-    private void RebaselineAllAlertRulesFromCurrentShops(IReadOnlyList<RustPlusClientReal.ShopMarker> shops)
+    private void RebaselineAllAlertRulesFromCurrentShops(IReadOnlyList<ArkClientReal.ShopMarker> shops)
     {
         foreach (var rule in _alertRules)
         {
@@ -3964,7 +3964,7 @@ private sealed record MarkerRef(System.Windows.Shapes.Ellipse Dot, double U_DIP,
         public DateTime FirstSeenUtc;
         public DateTime? LastSeenUtc;
         public bool AnnouncedSuspicious = false;
-        public RustPlusClientReal.ShopMarker? LastSnapshot;
+        public ArkClientReal.ShopMarker? LastSnapshot;
     }
 
     private readonly Dictionary<uint, ShopLifetimeInfo> _shopLifetimes = new();
@@ -4111,7 +4111,7 @@ private sealed record MarkerRef(System.Windows.Shapes.Ellipse Dot, double U_DIP,
     private static string PairingConfigPath =>
     System.IO.Path.Combine(
         Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
-        "ArkDuckBot", "rustplusjs-config.json");
+        "ArkDuckBot", "arkjs-config.json");
 
     private async Task<bool> ResetPairingConfigAsync(bool stopListenerFirst = true)
     {

@@ -1,4 +1,4 @@
-using RustPlusDesk.Services;
+using ArkDuckBot.Services;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,7 +10,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Threading;
 
-namespace RustPlusDesk.Views;
+namespace ArkDuckBot.Views;
 
 public partial class MainWindow
 {
@@ -30,10 +30,10 @@ public partial class MainWindow
     };
 
     // Returns true if this is a Deep Sea event NPC shop (known name + outside the playable grid)
-    private bool IsDeepSeaNpcShop(RustPlusClientReal.ShopMarker s)
+    private bool IsDeepSeaNpcShop(ArkClientReal.ShopMarker s)
         => s.Label != null && _deepSeaNpcShopNames.Contains(s.Label) && s.X < 0;
 
-    private void CheckDeepSeaEvent(IEnumerable<RustPlusClientReal.ShopMarker> shops)
+    private void CheckDeepSeaEvent(IEnumerable<ArkClientReal.ShopMarker> shops)
     {
         var deepSeaShop = shops.FirstOrDefault(s =>
             s.Label != null && s.Label.Contains("Casino Bar Shopkeeper"));
@@ -96,7 +96,7 @@ public partial class MainWindow
         return TryGetGridRef(x, y, out var g) ? g : "Unknown";
     }
 
-    private static void PrefetchShopIcons(IEnumerable<RustPlusClientReal.ShopMarker> shops)
+    private static void PrefetchShopIcons(IEnumerable<ArkClientReal.ShopMarker> shops)
     {
         foreach (var s in shops)
         {
@@ -113,9 +113,9 @@ public partial class MainWindow
     {
         if (sender is FrameworkElement fe)
         {
-            List<RustPlusClientReal.ShopMarker> cluster = null;
-            if (fe.Tag is RustPlusClientReal.ShopMarker s) cluster = new List<RustPlusClientReal.ShopMarker> { s };
-            else if (fe.Tag is IEnumerable<RustPlusClientReal.ShopMarker> c) cluster = c.ToList();
+            List<ArkClientReal.ShopMarker> cluster = null;
+            if (fe.Tag is ArkClientReal.ShopMarker s) cluster = new List<ArkClientReal.ShopMarker> { s };
+            else if (fe.Tag is IEnumerable<ArkClientReal.ShopMarker> c) cluster = c.ToList();
 
             if (cluster != null && cluster.Count > 0)
             {
@@ -171,7 +171,7 @@ public partial class MainWindow
 
     private async Task PollShopsOnceAsync(bool force = false)
     {
-        if (_rust is not RustPlusClientReal real) return;
+        if (_rust is not ArkClientReal real) return;
         if (Interlocked.CompareExchange(ref _shopPollLock, 1, 0) != 0) return;
 
         try
@@ -182,7 +182,7 @@ public partial class MainWindow
                 return;
             }
 
-            List<RustPlusClientReal.ShopMarker> shops = null;
+            List<ArkClientReal.ShopMarker> shops = null;
             int retries = 0;
             while (retries < 3)
             {
@@ -251,7 +251,7 @@ public partial class MainWindow
         }
     }
 
-    private async Task DetectNewShopsAsync(IReadOnlyList<RustPlusClientReal.ShopMarker> shops)
+    private async Task DetectNewShopsAsync(IReadOnlyList<ArkClientReal.ShopMarker> shops)
     {
         if (_initialShopSnapshotTimeUtc == DateTime.MinValue)
         {
@@ -297,7 +297,7 @@ public partial class MainWindow
         }
     }
 
-    private void UpdateShopLifetimes(IReadOnlyList<RustPlusClientReal.ShopMarker> shops)
+    private void UpdateShopLifetimes(IReadOnlyList<ArkClientReal.ShopMarker> shops)
     {
         foreach (var kv in _shopLifetimes)
         {
@@ -383,17 +383,17 @@ public partial class MainWindow
         _shopEls.Clear();
     }
 
-    private void UpdateShopsUI(IReadOnlyList<RustPlusClientReal.ShopMarker> shops)
+    private void UpdateShopsUI(IReadOnlyList<ArkClientReal.ShopMarker> shops)
     {
         if (Overlay == null || _worldSizeS <= 0 || _worldRectPx.Width <= 0) return;
 
         // 1) Cluster shops by proximity (e.g., within 50 world units to cover typical vending bases)
-        var clusters = new List<List<RustPlusClientReal.ShopMarker>>();
+        var clusters = new List<List<ArkClientReal.ShopMarker>>();
         const double CLUSTER_DIST = 50.0; 
 
         foreach (var s in shops)
         {
-            List<RustPlusClientReal.ShopMarker>? target = null;
+            List<ArkClientReal.ShopMarker>? target = null;
             foreach (var c in clusters)
             {
                 // Compare against cluster average position
@@ -409,7 +409,7 @@ public partial class MainWindow
             }
 
             if (target != null) target.Add(s);
-            else clusters.Add(new List<RustPlusClientReal.ShopMarker> { s });
+            else clusters.Add(new List<ArkClientReal.ShopMarker> { s });
         }
 
         var incoming = new HashSet<uint>();
@@ -527,7 +527,7 @@ public partial class MainWindow
 
     private void ShopElement_MouseEnter(object sender, MouseEventArgs e)
     {
-        if (sender is FrameworkElement fe && fe.Tag is List<RustPlusClientReal.ShopMarker> cluster)
+        if (sender is FrameworkElement fe && fe.Tag is List<ArkClientReal.ShopMarker> cluster)
         {
             _shopDetailHideTimer?.Stop();
             
@@ -569,7 +569,7 @@ public partial class MainWindow
         ShopDetailsPopup.MouseLeave += (s, e) => StartShopDetailHideTimer();
     }
 
-    private void ShowShopDetails(List<RustPlusClientReal.ShopMarker> cluster, FrameworkElement anchor = null)
+    private void ShowShopDetails(List<ArkClientReal.ShopMarker> cluster, FrameworkElement anchor = null)
     {
         if (ShopDetailsPopup == null || ShopDetailsContent == null) return;
         
@@ -661,7 +661,7 @@ public partial class MainWindow
         if (ShopDetailsPopup != null) ShopDetailsPopup.Visibility = Visibility.Collapsed;
     }
 
-    private bool IsShopEmpty(RustPlusClientReal.ShopMarker s)
+    private bool IsShopEmpty(ArkClientReal.ShopMarker s)
     {
         if (s.Orders == null || s.Orders.Count == 0) return true;
         return s.Orders.All(o => o.Stock <= 0);

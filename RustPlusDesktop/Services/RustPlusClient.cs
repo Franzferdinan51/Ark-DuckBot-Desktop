@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace ArkDuckBot.Services;
 
-public class RustPlusClient
+public class ArkClient
 {
     private ClientWebSocket? _ws;
 

@@ -1,10 +1,10 @@
-using RustPlusDesk.Services;
+using ArkDuckBot.Services;
 using System;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 
-namespace RustPlusDesk.Views;
+namespace ArkDuckBot.Views;
 
 public partial class MainWindow
 {
@@ -107,10 +107,10 @@ public partial class MainWindow
         return true;
     }
 
-    private string GetGridLabel(RustPlusClientReal.ShopMarker s)
+    private string GetGridLabel(ArkClientReal.ShopMarker s)
         => TryGetGridRef(s.X, s.Y, out var g) ? g : "off-grid";
 
-    private string GetGridLabel(RustPlusClientReal.DynMarker m) => GetGridLabel(m.X, m.Y);
+    private string GetGridLabel(ArkClientReal.DynMarker m) => GetGridLabel(m.X, m.Y);
 
     private string GetGridLabel(double x, double y)
         => TryGetGridRef(x, y, out var g) ? g : "off-grid";

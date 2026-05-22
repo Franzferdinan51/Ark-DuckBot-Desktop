@@ -50,7 +50,7 @@ public partial class MainWindow
     {
         try
         {
-            if (_rust is RustPlusClientReal real && _vm.Selected?.IsConnected == true)
+            if (_rust is ArkClientReal real && _vm.Selected?.IsConnected == true)
             {
                 var st = await real.GetServerStatusAsync();
                 if (st != null && st.Players >= 0)
@@ -135,7 +135,7 @@ public partial class MainWindow
             profile.IsConnected = true;
             profile.IsFullConnected = false;
 
-            if (_rust is RustPlusClientReal real)
+            if (_rust is ArkClientReal real)
             {
                 real.EnsureEventsHooked();
                 
@@ -172,7 +172,7 @@ public partial class MainWindow
         {
             try
             {
-                if (_rust is RustPlusClientReal real)
+                if (_rust is ArkClientReal real)
                 {
                     var st = await real.GetServerStatusAsync(ct);
                     if (st != null && st.Players >= 0)
@@ -265,7 +265,7 @@ public partial class MainWindow
             // Shorter initial delay — just enough for the WS to be ready
             await Task.Delay(500);
 
-            var real = _rust as RustPlusClientReal;
+            var real = _rust as ArkClientReal;
             if (real != null)
             {
                 real.StorageSnapshotReceived -= OnStorageSnapshot;

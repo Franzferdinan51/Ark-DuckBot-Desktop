@@ -77,7 +77,7 @@ public partial class MainWindow
         try
         {
             if (_rust != null)
-                await _rust.DisconnectAsync();   // RustPlusClientReal trennt hier sauber und setzt _api = null
+                await _rust.DisconnectAsync();   // ArkClientReal trennt hier sauber und setzt _api = null
         }
         catch { }
 

@@ -11,18 +11,18 @@ using System.Threading;
 using System.IO.Compression;
 using System.Threading.Tasks;
 
-namespace RustPlusDesk.Services
+namespace ArkDuckBot.Services
 {
 
     /// <summary>
-    /// Startet das rustplus.js-CLI (fcm-register/fcm-listen) als Hintergrundprozess
+    /// Startet das ark.js-CLI (fcm-register/fcm-listen) als Hintergrundprozess
     /// und leitet eingehende Pairing-Payloads an die App weiter.
     /// </summary>
     public class PairingListenerRealProcess : IPairingListener
     {
         public event EventHandler<PairingPayload>? Paired;
         private static readonly Regex Ansi = new(@"\x1B\[[0-9;]*[A-Za-z]", RegexOptions.Compiled);
-        private static readonly Regex RustUrl = new(@"rustplus://[^\s'\"">]+", RegexOptions.IgnoreCase | RegexOptions.Compiled);
+        private static readonly Regex RustUrl = new(@"ark://[^\s'\"">]+", RegexOptions.IgnoreCase | RegexOptions.Compiled);
         // in PairingListenerRealProcess (Feldebene)
         private string? _lastPairKey;
         private DateTime _lastPairAt;
@@ -67,7 +67,7 @@ namespace RustPlusDesk.Services
 
         private string ConfigPath => Path.Combine(
             Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
-            "ArkDuckBot", "rustplusjs-config.json");
+            "ArkDuckBot", "arkjs-config.json");
         public event EventHandler<TeamChatMessage>? ChatReceived;
 
         private void TryFlushChat()
@@ -98,7 +98,7 @@ namespace RustPlusDesk.Services
                 ?? throw new InvalidOperationException(RuntimeHelper.GetNodeNotFoundMessage());
 
             var cli = RuntimeHelper.ResolveCliEntry(out var wd)
-                ?? throw new InvalidOperationException("rustplus-cli not found (rustplus-cli.zip missing or extraction failed).");
+                ?? throw new InvalidOperationException("ark-cli not found (ark-cli.zip missing or extraction failed).");
 
             Directory.CreateDirectory(Path.GetDirectoryName(ConfigPath)!);
 
@@ -231,7 +231,7 @@ namespace RustPlusDesk.Services
             return Task.CompletedTask;
         }
 
-        private static bool TryParseRustPlusUrl(string url, out PairingPayload? p)
+        private static bool TryParseArkUrl(string url, out PairingPayload? p)
         {
             p = null;
             try
@@ -348,12 +348,12 @@ namespace RustPlusDesk.Services
                 s.IndexOf("ERR!", StringComparison.OrdinalIgnoreCase) >= 0)
                 Failed?.Invoke(this, s);
 
-            // 0) rustplus:// Deep-Link (falls vorhanden)
+            // 0) ark:// Deep-Link (falls vorhanden)
             var lm = RustUrl.Match(s);
-            if (lm.Success && TryParseRustPlusUrl(lm.Value, out var urlPayload) && urlPayload != null)
+            if (lm.Success && TryParseArkUrl(lm.Value, out var urlPayload) && urlPayload != null)
             {
                 Paired?.Invoke(this, urlPayload);
-                _log($"Pairing (via rustplus://) → {urlPayload.Host}:{urlPayload.Port} // Steam {urlPayload.SteamId64}");
+                _log($"Pairing (via ark://) → {urlPayload.Host}:{urlPayload.Port} // Steam {urlPayload.SteamId64}");
                 return;
             }
             // ### A) raw key/value-Zeilen erkennen (channelId/title/body)
@@ -650,7 +650,7 @@ namespace RustPlusDesk.Services
                 return "⚠️ Zugriffsrechte-Problem. Als Benutzer mit ausreichenden Rechten starten.";
 
             if (l.Contains("node:internal") && l.Contains("modules") && l.Contains("cannot find module"))
-                return "❌ CLI-Module fehlen oder sind beschädigt. Bitte „rustplus-cli.zip“ korrekt entpacken.";
+                return "❌ CLI-Module fehlen oder sind beschädigt. Bitte „ark-cli.zip“ korrekt entpacken.";
 
             // Fallback: Originalzeile beibehalten
             return s;
@@ -768,7 +768,7 @@ namespace RustPlusDesk.Services
                 ?? throw new InvalidOperationException(RuntimeHelper.GetNodeNotFoundMessage());
 
             var cli = RuntimeHelper.ResolveCliEntry(out var wd)
-                ?? throw new InvalidOperationException("rustplus-cli not found (rustplus-cli.zip missing or extraction failed).");
+                ?? throw new InvalidOperationException("ark-cli not found (ark-cli.zip missing or extraction failed).");
 
             Directory.CreateDirectory(Path.GetDirectoryName(ConfigPath)!);
 
@@ -842,7 +842,7 @@ namespace RustPlusDesk.Services
         // ── Helpers ─────────────────────────────────────────────────────────────────
 
         /// <summary>
-        /// Reads the rustplusjs-config.json, injects issue_date / expiry_date / steam_id,
+        /// Reads the arkjs-config.json, injects issue_date / expiry_date / steam_id,
         /// and writes it back so the file is self-contained for the next app launch.
         /// </summary>
         public void EnrichFcmConfig(DateTime issuedAt, DateTime expiresAt, string? steamId)

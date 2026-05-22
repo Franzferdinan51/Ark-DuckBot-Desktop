@@ -2,11 +2,11 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using RustPlusDesk.Models;
-using RustPlusDesk.Services;
+using ArkDuckBot.Models;
+using ArkDuckBot.Services;
 
 
-namespace RustPlusDesk.Views;
+namespace ArkDuckBot.Views;
 
 public partial class MainWindow
 {
@@ -46,7 +46,7 @@ public partial class MainWindow
         cmd = cmd.Substring(prefix.Length); // Remove prefix for matching
         _lastChatCommandTime = DateTime.UtcNow;
 
-        if (_rust is not RustPlusClientReal real) return;
+        if (_rust is not ArkClientReal real) return;
 
         // Command: Pop
         if (cmd == profile.CmdPop.ToLowerInvariant())
@@ -368,7 +368,7 @@ public partial class MainWindow
         }
     }
 
-    private async Task ProcessUpkeepCommand(RustPlusClientReal real, uint entityId, string author)
+    private async Task ProcessUpkeepCommand(ArkClientReal real, uint entityId, string author)
     {
         var profile = _vm.Selected;
         if (profile == null) return;
@@ -404,7 +404,7 @@ public partial class MainWindow
         }
     }
 
-    private async Task ToggleCommandSwitch(RustPlusClientReal real, uint entityId, string author)
+    private async Task ToggleCommandSwitch(ArkClientReal real, uint entityId, string author)
     {
         var profile = _vm.Selected;
         if (profile == null) return;

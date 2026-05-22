@@ -1,6 +1,6 @@
-using RustPlusDesk.Models;
-using RustPlusDesk.Services;
-using RustPlusDesk.Views;
+using ArkDuckBot.Models;
+using ArkDuckBot.Services;
+using ArkDuckBot.Views;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;

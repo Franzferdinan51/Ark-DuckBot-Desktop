@@ -54,7 +54,7 @@ namespace ArkDuckBot.Services
             try
             {
                 using var http = new HttpClient();
-                http.DefaultRequestHeaders.UserAgent.Add(new ProductInfoHeaderValue("RustPlusDesk", VersionForCompare.ToString()));
+                http.DefaultRequestHeaders.UserAgent.Add(new ProductInfoHeaderValue("ArkDuckBot", VersionForCompare.ToString()));
                 http.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/vnd.github+json"));
                 http.DefaultRequestHeaders.Add("X-GitHub-Api-Version", "2022-11-28");
 
@@ -102,7 +102,7 @@ namespace ArkDuckBot.Services
             try
             {
                 using var http = new HttpClient();
-                http.DefaultRequestHeaders.UserAgent.Add(new ProductInfoHeaderValue("RustPlusDesk", VersionForCompare.ToString()));
+                http.DefaultRequestHeaders.UserAgent.Add(new ProductInfoHeaderValue("ArkDuckBot", VersionForCompare.ToString()));
 
                 using var resp = await http.GetAsync(url, HttpCompletionOption.ResponseHeadersRead);
                 resp.EnsureSuccessStatusCode();

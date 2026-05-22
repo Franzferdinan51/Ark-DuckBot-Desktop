@@ -18,7 +18,7 @@ using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using StorageSnap = RustPlusDesk.Models.StorageSnapshot;
+using StorageSnap = ArkDuckBot.Models.StorageSnapshot;
 
 namespace ArkDuckBot.Views;
 
@@ -592,12 +592,12 @@ private async void DeviceToggle_Click(object sender, RoutedEventArgs e)
 
     private async Task RefreshDeviceStateAsync(SmartDevice dev, bool log = true, bool forcePull = false, int maxRetries = 3)
     {
-        if (_rust is not RustPlusClientReal real) return;
+        if (_rust is not ArkClientReal real) return;
 
         // Skip refreshing if it's a Group, because Groups don't exist on the Rust server
         if (dev.IsGroup) return;
 
-        if (RustPlusClientReal.IsStorageDevice(dev))
+        if (ArkClientReal.IsStorageDevice(dev))
         {
             try
             {
@@ -1295,11 +1295,11 @@ private void DeviceRow_Click(object sender, MouseButtonEventArgs e)
         var toProbe = _vm.Selected.Devices.Where(d => 
             string.IsNullOrEmpty(d.Kind) && 
             !d.IsGroup && 
-            (_rust is not RustPlusClientReal rpc || !rpc.TryGetCachedStorage(d.EntityId, out _))
+            (_rust is not ArkClientReal rpc || !rpc.TryGetCachedStorage(d.EntityId, out _))
         ).ToList();
 
         // Check if some devices can be identified from cache without probing
-        if (_rust is RustPlusClientReal real)
+        if (_rust is ArkClientReal real)
         {
             foreach (var d in _vm.Selected.Devices.Where(d => string.IsNullOrEmpty(d.Kind) && !d.IsGroup).ToList())
             {
@@ -1314,7 +1314,7 @@ private void DeviceRow_Click(object sender, MouseButtonEventArgs e)
         toProbe = _vm.Selected.Devices.Where(d => 
             string.IsNullOrEmpty(d.Kind) && 
             !d.IsGroup && 
-            (_rust is not RustPlusClientReal rpc || !rpc.TryGetCachedStorage(d.EntityId, out _))
+            (_rust is not ArkClientReal rpc || !rpc.TryGetCachedStorage(d.EntityId, out _))
         ).ToList();
 
         if (toProbe.Count == 0) return;
@@ -1357,7 +1357,7 @@ private void DeviceRow_Click(object sender, MouseButtonEventArgs e)
         _vm?.NotifyDevicesChanged();
     }
 
-// kommt aus RustPlusClientReal.StorageSnapshotReceived
+// kommt aus ArkClientReal.StorageSnapshotReceived
     private void OnStorageSnapshot(uint entityId, StorageSnapshot snap)
 {
     Dispatcher.Invoke(() =>

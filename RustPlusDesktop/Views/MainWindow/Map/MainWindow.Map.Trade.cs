@@ -1,4 +1,4 @@
-using RustPlusDesk.Services;
+using ArkDuckBot.Services;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,16 +10,16 @@ using System.Windows.Input;
 using System.Windows.Markup;
 using System.Windows.Media;
 
-namespace RustPlusDesk.Views;
+namespace ArkDuckBot.Views;
 
 public partial class MainWindow
 {
     private class TwoStepFlip
     {
-        public RustPlusClientReal.ShopMarker ShopFirst;
-        public RustPlusClientReal.ShopMarker ShopSecond;
-        public RustPlusClientReal.ShopOrder OfferFirst;
-        public RustPlusClientReal.ShopOrder OfferSecond;
+        public ArkClientReal.ShopMarker ShopFirst;
+        public ArkClientReal.ShopMarker ShopSecond;
+        public ArkClientReal.ShopOrder OfferFirst;
+        public ArkClientReal.ShopOrder OfferSecond;
 
         public string StartCurrencyName = "";  // Währung, mit der wir anfangen und am Ende wieder rauskommen
         public string MidItemName = "";        // Zwischen-Item
@@ -39,8 +39,8 @@ public partial class MainWindow
     // Simuliert: erst (shop1,o1) mehrfach laufen lassen, dann (shop2,o2) benutzen.
     // Gibt BESTE profitable Kombination zurück oder null.
     private TwoStepFlip? SimulateSequence(
-    RustPlusClientReal.ShopMarker shop1, RustPlusClientReal.ShopOrder o1,
-    RustPlusClientReal.ShopMarker shop2, RustPlusClientReal.ShopOrder o2)
+    ArkClientReal.ShopMarker shop1, ArkClientReal.ShopOrder o1,
+    ArkClientReal.ShopMarker shop2, ArkClientReal.ShopOrder o2)
     {
         // Daten aus o1
         int pay1Id = o1.CurrencyItemId;
@@ -121,7 +121,7 @@ public partial class MainWindow
         return best;
     }
 
-    private List<TwoStepFlip> FindTwoStepFlips(List<RustPlusClientReal.ShopMarker> shops)
+    private List<TwoStepFlip> FindTwoStepFlips(List<ArkClientReal.ShopMarker> shops)
     {
         var flips = new List<TwoStepFlip>();
 
@@ -316,8 +316,8 @@ public partial class MainWindow
     }
 
     private FrameworkElement BuildFlipStepPanel(string stepLabel,
-    RustPlusClientReal.ShopMarker shop,
-    RustPlusClientReal.ShopOrder order)
+    ArkClientReal.ShopMarker shop,
+    ArkClientReal.ShopOrder order)
     {
         var panel = new StackPanel
         {
@@ -529,14 +529,14 @@ public partial class MainWindow
         _payPreviewList.Items.Clear();
 
         // helper wie in RefreshShopSearchResults
-        bool MatchGets(RustPlusClientReal.ShopOrder o, string q)
+        bool MatchGets(ArkClientReal.ShopOrder o, string q)
         {
             if (string.IsNullOrWhiteSpace(q)) return false;
             var pretty = ResolveItemName(o.ItemId, o.ItemShortName);
             return pretty.IndexOf(q, StringComparison.OrdinalIgnoreCase) >= 0;
         }
 
-        bool MatchPays(RustPlusClientReal.ShopOrder o, string q)
+        bool MatchPays(ArkClientReal.ShopOrder o, string q)
         {
             if (string.IsNullOrWhiteSpace(q)) return false;
             var pretty = ResolveItemName(o.CurrencyItemId, o.CurrencyShortName);
@@ -756,8 +756,8 @@ public partial class MainWindow
 
     private class PathStep
     {
-        public RustPlusClientReal.ShopMarker Shop;
-        public RustPlusClientReal.ShopOrder Order;
+        public ArkClientReal.ShopMarker Shop;
+        public ArkClientReal.ShopOrder Order;
 
         public string FromItem = "";
         public string ToItem = "";
@@ -795,8 +795,8 @@ public partial class MainWindow
         public string PayPrettyName = "";
         public string GetPrettyName = "";
 
-        public RustPlusClientReal.ShopMarker Shop;
-        public RustPlusClientReal.ShopOrder Order;
+        public ArkClientReal.ShopMarker Shop;
+        public ArkClientReal.ShopOrder Order;
     }
 
 

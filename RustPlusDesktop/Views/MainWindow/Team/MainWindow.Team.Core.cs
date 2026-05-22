@@ -11,9 +11,9 @@ using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using RustPlusDesk.Services;
+using ArkDuckBot.Services;
 
-namespace RustPlusDesk.Views;
+namespace ArkDuckBot.Views;
 
 public partial class MainWindow
 {
@@ -21,7 +21,7 @@ public partial class MainWindow
     public ObservableCollection<TeamMemberVM> TeamMembers { get; } = new();
 
     private readonly Dictionary<ulong, ImageSource> _avatarCache = new();
-    private RustPlusClientReal? _real => _rust as RustPlusClientReal;
+    private ArkClientReal? _real => _rust as ArkClientReal;
 
     public sealed class TeamMemberVM : INotifyPropertyChanged
     {
@@ -427,7 +427,7 @@ public partial class MainWindow
         if (vm == null) return;
         if (!IAmLeaderNow()) { AppendLog("Only Leader can promote."); return; }
         if (vm.SteamId == _mySteamId) return;
-        try { await (_real as RustPlusClientReal)?.PromoteToLeaderAsync(vm.SteamId); }
+        try { await (_real as ArkClientReal)?.PromoteToLeaderAsync(vm.SteamId); }
         catch (Exception ex) { AppendLog("[team] promote error: " + ex.Message); }
     }
 
@@ -465,11 +465,11 @@ public partial class MainWindow
         if (vm == null) return;
         if (!IAmLeaderNow()) { AppendLog("Only Leader can kick."); return; }
         if (vm.SteamId == _mySteamId) return;
-        try { await (_real as RustPlusClientReal)?.KickTeamMemberAsync(vm.SteamId); }
+        try { await (_real as ArkClientReal)?.KickTeamMemberAsync(vm.SteamId); }
         catch (Exception ex) { AppendLog("[team] kick error: " + ex.Message); }
     }
 
-    private string ResolvePlayerName(RustPlusClientReal.DynMarker m)
+    private string ResolvePlayerName(ArkClientReal.DynMarker m)
     {
         if (!string.IsNullOrWhiteSpace(m.Name)) return m.Name;
         if (!string.IsNullOrWhiteSpace(m.Label)) return m.Label;
@@ -487,7 +487,7 @@ public partial class MainWindow
     {
         _lastTeamRefresh = DateTime.UtcNow;
 
-        if (_rust is not RustPlusClientReal real) return;
+        if (_rust is not ArkClientReal real) return;
 
         try
         {

@@ -9,12 +9,12 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Shapes;
 using Microsoft.Web.WebView2.Wpf;
-using RustPlusDesk.Helpers;
-using RustPlusDesk.Models;
-using RustPlusDesk.Services;
+using ArkDuckBot.Helpers;
+using ArkDuckBot.Models;
+using ArkDuckBot.Services;
 using ui = Wpf.Ui.Controls;
 
-namespace RustPlusDesk.Views;
+namespace ArkDuckBot.Views;
 
 public partial class MainWindow
 {
@@ -297,7 +297,7 @@ public partial class MainWindow
             // Initialize webview if needed
             if (EmbeddedBMBrowser != null && EmbeddedBMBrowser.CoreWebView2 == null)
             {
-                var dataPath = System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "RustPlusDesk", "WebView2_BM");
+                var dataPath = System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "ArkDuckBot", "WebView2_BM");
                 System.IO.Directory.CreateDirectory(dataPath);
                 var env = await Microsoft.Web.WebView2.Core.CoreWebView2Environment.CreateAsync(userDataFolder: dataPath);
                 await EmbeddedBMBrowser.EnsureCoreWebView2Async(env);
@@ -431,7 +431,7 @@ public partial class MainWindow
         
         if (EmbeddedBMBrowser != null && EmbeddedBMBrowser.CoreWebView2 == null)
         {
-            var dataPath = System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "RustPlusDesk", "WebView2_BM");
+            var dataPath = System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "ArkDuckBot", "WebView2_BM");
             System.IO.Directory.CreateDirectory(dataPath);
             var env = await Microsoft.Web.WebView2.Core.CoreWebView2Environment.CreateAsync(userDataFolder: dataPath);
             await EmbeddedBMBrowser.EnsureCoreWebView2Async(env);
@@ -1112,7 +1112,7 @@ public partial class MainWindow
             {
                 try 
                 {
-                    var dataPath = System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "RustPlusDesk", "WebView2_Report");
+                    var dataPath = System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "ArkDuckBot", "WebView2_Report");
                     var env = await Microsoft.Web.WebView2.Core.CoreWebView2Environment.CreateAsync(userDataFolder: dataPath);
                     if (!win.IsLoaded) return;
                     await wv.EnsureCoreWebView2Async(env);

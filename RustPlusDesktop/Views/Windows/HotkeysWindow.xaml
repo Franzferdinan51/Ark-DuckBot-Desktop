@@ -1,4 +1,4 @@
-﻿<Window x:Class="RustPlusDesk.Views.HotkeysWindow"
+﻿<Window x:Class="ArkDuckBot.Views.HotkeysWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="Hotkeys"

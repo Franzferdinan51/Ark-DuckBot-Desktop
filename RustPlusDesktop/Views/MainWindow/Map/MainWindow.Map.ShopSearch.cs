@@ -1,6 +1,6 @@
 using Microsoft.Web.WebView2.Core;
 using Microsoft.Web.WebView2.Wpf;
-using RustPlusDesk.Services;
+using ArkDuckBot.Services;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -13,7 +13,7 @@ using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 using System.Windows.Media;
 
-namespace RustPlusDesk.Views;
+namespace ArkDuckBot.Views;
 
 public partial class MainWindow
 {
@@ -30,8 +30,8 @@ public partial class MainWindow
 
     // ── WPF card builder — still used by PathFinder & map hover popup ─────────
     private FrameworkElement BuildShopSearchCard(
-        RustPlusClientReal.ShopMarker s,
-        IEnumerable<RustPlusClientReal.ShopOrder> offers,
+        ArkClientReal.ShopMarker s,
+        IEnumerable<ArkClientReal.ShopOrder> offers,
         bool compact)
     {
         var card = new Border
@@ -71,7 +71,7 @@ public partial class MainWindow
         return card;
     }
 
-    private FrameworkElement BuildOfferRowSearchUI(RustPlusClientReal.ShopOrder o, bool compact)
+    private FrameworkElement BuildOfferRowSearchUI(ArkClientReal.ShopOrder o, bool compact)
     {
         bool outOfStock = o.Stock <= 0;
         var g = new Grid { Margin = new Thickness(0, 2, 0, 2), Opacity = outOfStock ? 0.6 : 1.0 };
@@ -219,7 +219,7 @@ public partial class MainWindow
         {
             var dataPath = Path.Combine(
                 Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-                "RustPlusDesk", "WebView2_ShopSearch");
+                "ArkDuckBot", "WebView2_ShopSearch");
             Directory.CreateDirectory(dataPath);
 
             var env = await CoreWebView2Environment.CreateAsync(userDataFolder: dataPath);
@@ -231,7 +231,7 @@ public partial class MainWindow
             string html = BuildShopSearchHtml();
             if (!string.IsNullOrWhiteSpace(html))
             {
-                var iconPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "RustPlusDesk", "icons");
+                var iconPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "ArkDuckBot", "icons");
                 if (Directory.Exists(iconPath))
                     wv.CoreWebView2.SetVirtualHostNameToFolderMapping("rusticons.local", iconPath, CoreWebView2HostResourceAccessKind.Allow);
 

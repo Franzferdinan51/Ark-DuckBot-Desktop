@@ -19,7 +19,7 @@ namespace ArkDuckBot.Views
 
     public partial class CameraWindow : Window
     {
-        private readonly RustPlusClientReal _real;
+        private readonly ArkClientReal _real;
         private readonly string _cameraId;
         private readonly DispatcherTimer _timer = new();
         private bool _running;
@@ -75,7 +75,7 @@ namespace ArkDuckBot.Views
         //  }
 
 
-        public CameraWindow(RustPlusClientReal real, string cameraId)
+        public CameraWindow(ArkClientReal real, string cameraId)
         {
             InitializeComponent();
             _real = real;
