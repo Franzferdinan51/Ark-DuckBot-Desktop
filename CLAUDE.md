@@ -13,7 +13,7 @@ dotnet publish -c Release --self-contained  # Publish single-file exe
 
 ## Architecture Overview
 
-ArkDuckBot Desktop is a WPF .NET 8.0 application that connects to ARK: Survival Ascended servers running the DuckBot mod. It maintains dual WebSocket connections: one to the game server (via RustPlusApi) and one to the DuckBot MCP Bridge AI system.
+ArkDuckBot Desktop is a WPF .NET 8.0 application that connects to **ARK: Survival Ascended** servers running the DuckBot mod. It maintains dual WebSocket connections: one to the game server (via ServerAPI) and one to the DuckBot MCP Bridge AI system.
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
@@ -24,14 +24,14 @@ ArkDuckBot Desktop is a WPF .NET 8.0 application that connects to ARK: Survival 
 │              Services Layer                                  │
 │  ┌──────────────┐  ┌──────────────┐  ┌──────────────────┐  │
 │  │ ArkApiClient │  │McpBridgeClient│  │ TrackingService  │  │
-│  │ (RustPlusApi)│  │ (AI Bridge)   │  │ (Settings)       │  │
+│  │ (ServerAPI)  │  │ (AI Bridge)   │  │ (Settings)       │  │
 │  └──────────────┘  └──────────────┘  └──────────────────┘  │
 │                                                              │
 │  ┌──────────────────────────────────────────────────────┐   │
 │  │          DuckBotOrchestrator (AI Central)            │   │
 │  │  ┌────────────┐ ┌────────────┐ ┌────────────────┐   │   │
 │  │  │DuckBotAi   │ │DuckBotAgent│ │DuckBotTools    │   │   │
-│  │  │Service     │ │(Tool Reg)  │ │(25+ ARK Tools) │   │   │
+│  │  │Service     │ │(Tool Reg)  │ │(25+ ASA Tools) │   │   │
 │  │  │Intent Route│ │Permissions │ │                 │   │   │
 │  │  └────────────┘ └────────────┘ └────────────────┘   │   │
 │  │  ┌────────────┐ ┌────────────┐ ┌────────────────┐   │   │
@@ -50,21 +50,21 @@ ArkDuckBot Desktop is a WPF .NET 8.0 application that connects to ARK: Survival 
 
 **DuckBotAiService** - Natural language intent parser. Routes to Query/Command/Action/Help/Chat handlers based on keyword detection.
 
-**DuckBotAgent** - Tool registry with permission tiers. All 25+ ARK tools organized by required tier level.
+**DuckBotAgent** - Tool registry with permission tiers. All 25+ ARK: Survival Ascended tools organized by required tier level.
 
 **DuckBotSkills** - Event-driven skill system. Built-in skills: wild_dino_alert (vip), auto_slay_dangerous (admin), player_join_welcome (player).
 
-**DuckBotHandler** - Command queue for C++ plugin communication. Sanitized console commands queued for polling by ARK server plugin.
+**DuckBotHandler** - Command queue for C++ plugin communication. Sanitized console commands queued for polling by ARK: Survival Ascended server plugin.
 
-**DuckBotKnowledge** - Encyclopedia with fuzzy search for dinos (rex, giga, megalodon, argy, etc.) and items (kibble, raw meat, etc.).
+**DuckBotKnowledge** - Encyclopedia with fuzzy search for ARK: Survival Ascended dinos (rex, giga, megalodon, argy, etc.) and items (kibble, raw meat, etc.).
 
 ## Connection Flow
 
 ```
-Connect → ArkApiClient (port 27020) + McpBridgeClient (port 8444)
+Connect → ArkApiClient (ServerAPI) + McpBridgeClient (port 8444)
            ↓                              ↓
-     Game Server                    DuckBot AI Bridge
-     (ServerAPI Plugin)            (Python MCP Bridge)
+     ARK: Survival Ascended          DuckBot AI Bridge
+     Server (ServerAPI Plugin)       (Python MCP Bridge)
                                         ↓
                                    LLM Provider
                                    (OpenRouter/Anthropic/etc)
@@ -75,9 +75,14 @@ Connect → ArkApiClient (port 27020) + McpBridgeClient (port 8444)
 - **Permission Tiers**: player < vip < mod < admin. Tools are gated by tier in DuckBotTools.
 - **Dual Port**: MCP Bridge uses port 8444 for desktop companion, 8443 for in-game connections.
 - **Event-Driven Skills**: Skills trigger on game events (player_joined, high_level_dino_detected) via DuckBotSkills.TriggerByEventAsync()
-- **Command Queue**: DuckBotHandler enqueues commands for the C++ plugin to poll, avoiding firewall issues on incoming connections.
+- **Command Queue**: DuckBotHandler enqueues commands for the ServerAPI plugin to poll, avoiding firewall issues on incoming connections.
 - **Namespace**: All code uses `ArkDuckBot` namespace (converted from RustPlusDesk).
+
+## Related Repositories
+
+- **DuckBot-For-ark**: https://github.com/Franzferdinan51/DuckBot-For-ark - C++ ServerAPI plugin + Python MCP Bridge for ARK: Survival Ascended
+- **WindowsGSM.ArkSAwithServerAPI**: https://github.com/ohmcodes/WindowsGSM.ArkSAwithServerAPI - Server management
 
 ## Repository
 
-Remote: https://github.com/Franzferdinan51/Ark-DuckBot-Desktop
+Remote: https://github.com/FranzFERDINAN51/Ark-DuckBot-Desktop
