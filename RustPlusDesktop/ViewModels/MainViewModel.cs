@@ -10,7 +10,7 @@ using System.Windows.Media;
 
 namespace ArkDuckBot.ViewModels;
 
-public class MainViewModel : INotifyPropertyChanged
+public class MainViewModel : INotifyPropertyChanged, IDisposable
 {
     private readonly System.Windows.Threading.DispatcherTimer _clockTimer;
     private ImageSource? _myAvatar;
@@ -469,4 +469,17 @@ public class MainViewModel : INotifyPropertyChanged
     // HILFSMETHODE: UI anstupsen, wenn Devices in-place aktualisiert wurden
     public void NotifyDevicesChanged()
         => OnPropertyChanged(nameof(CurrentDevices));
+
+    public void Dispose()
+    {
+        // Stop timers (DispatcherTimer doesn't have Dispose, use Stop)
+        _clockTimer?.Stop();
+
+        // Dispose any other IDisposable resources
+        // Note: Services like UpdateService are disposed by MainWindow
+        // ViewModels are typically not responsible for disposing services they don't own
+
+        // Suppress finalization
+        GC.SuppressFinalize(this);
+    }
 }

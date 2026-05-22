@@ -9,7 +9,7 @@ using ArkDuckBot.Services;
 
 namespace ArkDuckBot.ViewModels;
 
-public class AiChatViewModel : INotifyPropertyChanged
+public class AiChatViewModel : INotifyPropertyChanged, IDisposable
 {
     private McpBridgeClient? _mcpClient;
     private string _currentPrompt = "";
@@ -184,6 +184,18 @@ public class AiChatViewModel : INotifyPropertyChanged
     protected void OnPropertyChanged([CallerMemberName] string? propertyName = null)
     {
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+    }
+
+    public void Dispose()
+    {
+        if (_mcpClient != null)
+        {
+            _mcpClient.AiResponseReceived -= OnAiResponse;
+            _mcpClient.ErrorOccurred -= OnMcpError;
+            _mcpClient.ConnectionStatusChanged -= OnConnectionChanged;
+            _mcpClient.ThinkingStateChanged -= OnThinkingStateChanged;
+            _mcpClient = null;
+        }
     }
 }
 

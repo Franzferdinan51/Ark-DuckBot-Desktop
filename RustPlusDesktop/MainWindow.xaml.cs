@@ -55,7 +55,7 @@ using ui = Wpf.Ui.Controls;
 namespace ArkDuckBot.Views;
 
 
-public partial class MainWindow : ui.FluentWindow
+public partial class MainWindow : ui.FluentWindow, IDisposable
 {
 
     private readonly MainViewModel _vm = new();
@@ -1034,6 +1034,30 @@ public partial class MainWindow : ui.FluentWindow
         }
         catch (Exception ex)
         { }
+    }
+
+    public void Dispose()
+    {
+        // Dispose MCP Bridge client to clean up WebSocket connections
+        _mcpBridge?.Dispose();
+
+        // Stop timers (DispatcherTimer doesn't have Dispose, use Stop)
+        _statusTimer?.Stop();
+        _upkeepTimer?.Stop();
+        _overlayHideTimer?.Stop();
+
+        // Dispose WebView2 if exists
+        _webView?.Dispose();
+
+        // Close overlay if exists
+        _overlay?.Close();
+
+        // Dispose any other IDisposable resources
+        _updateService?.Dispose();
+        _vm?.Dispose();
+
+        // Suppress finalization
+        GC.SuppressFinalize(this);
     }
 
     // --- Chat Persistence & Switching ---
