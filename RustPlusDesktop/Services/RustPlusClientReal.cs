@@ -1,6 +1,5 @@
 // Services/ArkClientReal.cs
-using ArkApi;                 // NuGet: HandyS11.ArkApi
-using ArkApi.Data.Events;
+using RustPlusApi;
 using ArkDuckBot.Models;
 using ArkDuckBot.Helpers;
 using ArkDuckBot.Views;
@@ -25,14 +24,14 @@ using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Xml.Linq;
-using TeamMsgArg = ArkApi.Data.Events.TeamMessageEventArg;
+using TeamMsgArg = RustPlusApi.Data.Events.TeamMessageEventArg;
 namespace ArkDuckBot.Services;
 
 
 
 public sealed class ArkClientReal : IArkClient, IDisposable
 {
-    private Ark? _api;
+    private RustPlus? _api;
     private readonly Action<string> _log;
     private string? _host;
     public string? Host => _host;
@@ -176,7 +175,7 @@ public sealed class ArkClientReal : IArkClient, IDisposable
     {
         if (_api is null) throw new InvalidOperationException("Nicht verbunden.");
 
-        var asm = typeof(Ark).Assembly;
+        var asm = typeof(RustPlus).Assembly;
         var reqType = asm.GetTypes().FirstOrDefault(t => t.Name.Equals("AppRequest", StringComparison.OrdinalIgnoreCase));
         if (reqType is null) return false;
 
@@ -223,7 +222,7 @@ public sealed class ArkClientReal : IArkClient, IDisposable
     {
         if (_api is null) throw new InvalidOperationException("Nicht verbunden.");
 
-        var asm = typeof(Ark).Assembly;
+        var asm = typeof(RustPlus).Assembly;
         var reqType = asm.GetTypes().FirstOrDefault(t => t.Name.Equals("AppRequest", StringComparison.OrdinalIgnoreCase));
         if (reqType is null) return false;
 
@@ -340,7 +339,7 @@ public sealed class ArkClientReal : IArkClient, IDisposable
         try
         {
             // Roh-Request bauen (SendRequestAsync(AppRequest{GetMapMarkers}))
-            var asm = typeof(Ark).Assembly;
+            var asm = typeof(RustPlus).Assembly;
             var reqType = asm.GetTypes().FirstOrDefault(x => x.Name.Equals("AppRequest", StringComparison.OrdinalIgnoreCase));
             var emptyType = asm.GetTypes().FirstOrDefault(x => x.Name.Equals("AppEmpty", StringComparison.OrdinalIgnoreCase));
             if (reqType == null || emptyType == null) { L("proto types not found"); return; }
@@ -571,7 +570,7 @@ public sealed class ArkClientReal : IArkClient, IDisposable
         try
         {
             // Roh-PATH (SendRequestAsync(AppRequest{GetMapMarkers})) → enum-sicher
-            var asm = typeof(Ark).Assembly;
+            var asm = typeof(RustPlus).Assembly;
             var reqType = asm.GetTypes().FirstOrDefault(x => x.Name.Equals("AppRequest", StringComparison.OrdinalIgnoreCase));
             var emptyTyp = asm.GetTypes().FirstOrDefault(x => x.Name.Equals("AppEmpty", StringComparison.OrdinalIgnoreCase));
             if (reqType == null || emptyTyp == null) return resultList;
@@ -1396,7 +1395,7 @@ rp.connect();
 
     private (object? req, object? idProp) MakeCamSubscribeRequest(string cameraId)
     {
-        var asm = typeof(Ark).Assembly;
+        var asm = typeof(RustPlus).Assembly;
         var reqType = asm.GetTypes().FirstOrDefault(x => x.Name.Equals("AppRequest", StringComparison.OrdinalIgnoreCase));
         if (reqType == null) return (null, null);
 
@@ -1430,7 +1429,7 @@ rp.connect();
 
     private (object? req, System.Reflection.PropertyInfo? idProp) MakeCamUnsubscribeRequest(string cameraId)
     {
-        var asm = typeof(Ark).Assembly;
+        var asm = typeof(RustPlus).Assembly;
         var reqType = asm.GetTypes().FirstOrDefault(x => x.Name.Equals("AppRequest", StringComparison.OrdinalIgnoreCase));
         if (reqType == null) return (null, null);
 
@@ -1538,7 +1537,7 @@ rp.connect();
         void L(string s) => _log?.Invoke("[cam] " + s);
 
         // 1) build and send AppRequest.CameraSubscribe
-        var appReqType = typeof(Ark).Assembly
+        var appReqType = typeof(RustPlus).Assembly
             .GetTypes().FirstOrDefault(t => t.Name.Equals("AppRequest", StringComparison.OrdinalIgnoreCase));
         if (appReqType is null) { L("AppRequest type not found"); return null; }
 
@@ -1689,7 +1688,7 @@ rp.connect();
 
     public void DebugDumpAppRequestShape()
     {
-        var asm = typeof(Ark).Assembly;
+        var asm = typeof(RustPlus).Assembly;
         var reqType = asm.GetTypes().FirstOrDefault(x => x.Name.Equals("AppRequest", StringComparison.OrdinalIgnoreCase));
         if (reqType == null) { _log?.Invoke("[cam] AppRequest type not found"); return; }
         _log?.Invoke("[cam] AppRequest properties:");
@@ -1704,7 +1703,7 @@ rp.connect();
 
     // Rust+ feuert dieses Event, sobald der Chat „geprimed“ wurde.
     // Wir mappen es auf unser eigenes DTO und reichen es weiter.
-    private void Api_OnTeamChatReceived(object? sender, TeamMessageEventArg e)
+    private void Api_OnTeamChatReceived(object? sender, TeamMsgArg e)
     {
         try
         {
@@ -3116,7 +3115,7 @@ rp.connect();
         // -------- Pfad 2: Contracts über AppRequest/AppEmpty (Protobuf-Stil) --------
         try
         {
-            var asm = typeof(Ark).Assembly;
+            var asm = typeof(RustPlus).Assembly;
             var reqType = asm.GetTypes().FirstOrDefault(x => x.Name.Equals("AppRequest", StringComparison.OrdinalIgnoreCase));
             var emptyType = asm.GetTypes().FirstOrDefault(x => x.Name.Equals("AppEmpty", StringComparison.OrdinalIgnoreCase));
 
@@ -3341,7 +3340,7 @@ rp.connect();
         static int AsInt(object? v) { try { return Convert.ToInt32(v); } catch { return 0; } }   // ← NEU
         try
     {
-        var asm = typeof(Ark).Assembly;
+        var asm = typeof(RustPlus).Assembly;
         var reqType   = asm.GetTypes().FirstOrDefault(x => x.Name.Equals("AppRequest", StringComparison.OrdinalIgnoreCase));
         var emptyType = asm.GetTypes().FirstOrDefault(x => x.Name.Equals("AppEmpty",   StringComparison.OrdinalIgnoreCase));
         if (reqType == null || emptyType == null) return null;
@@ -3604,7 +3603,7 @@ rp.connect();
         try
         {
             // Nur PATH B (roh, enum-sicher)
-            var asm = typeof(Ark).Assembly;
+            var asm = typeof(RustPlus).Assembly;
             var reqType = asm.GetTypes().FirstOrDefault(x => x.Name.Equals("AppRequest", StringComparison.OrdinalIgnoreCase));
             var emptyType = asm.GetTypes().FirstOrDefault(x => x.Name.Equals("AppEmpty", StringComparison.OrdinalIgnoreCase));
             if (reqType == null || emptyType == null) return list;
@@ -3965,7 +3964,7 @@ rp.connect();
         {
             try
             {
-                var asm = typeof(Ark).Assembly;
+                var asm = typeof(RustPlus).Assembly;
                 var reqType = asm.GetTypes().FirstOrDefault(x => x.Name.Equals("AppRequest", StringComparison.OrdinalIgnoreCase));
                 var emptyTyp = asm.GetTypes().FirstOrDefault(x => x.Name.Equals("AppEmpty", StringComparison.OrdinalIgnoreCase));
                 if (reqType != null && emptyTyp != null)
@@ -4272,7 +4271,7 @@ rp.connect();
         {
             try
             {
-                var asm = typeof(Ark).Assembly;
+                var asm = typeof(RustPlus).Assembly;
                 var reqType = asm.GetTypes().FirstOrDefault(x => x.Name.Equals("AppRequest", StringComparison.OrdinalIgnoreCase));
                 var emptyTyp = asm.GetTypes().FirstOrDefault(x => x.Name.Equals("AppEmpty", StringComparison.OrdinalIgnoreCase));
                 if (reqType != null && emptyTyp != null)
@@ -4570,7 +4569,7 @@ rp.connect();
 
         try
         {
-            var asm = typeof(Ark).Assembly;
+            var asm = typeof(RustPlus).Assembly;
             var reqType = asm.GetTypes().FirstOrDefault(t => t.Name.Equals("AppRequest", StringComparison.OrdinalIgnoreCase));
             var empty = asm.GetTypes().FirstOrDefault(t => t.Name.Equals("AppEmpty", StringComparison.OrdinalIgnoreCase));
             if (reqType is null || empty is null) return null;
@@ -4692,7 +4691,7 @@ rp.connect();
         // 2) Contracts via aktuelle API (AppRequest/GetEntityInfo)
         try
         {
-            var asm = typeof(Ark).Assembly;
+            var asm = typeof(RustPlus).Assembly;
 
             var reqType = asm.GetTypes().FirstOrDefault(t => t.Name == "AppRequest");
             var emptyType = asm.GetTypes().FirstOrDefault(t => t.Name == "AppEmpty");
@@ -4775,7 +4774,7 @@ rp.connect();
 
         async Task<(bool ok, string? err)> TryAsync(bool useProxy)
         {
-            _api = new Ark(profile.Host, profile.Port, steamId, playerToken, useProxy);
+            _api = new RustPlus(profile.Host, profile.Port, steamId, playerToken, useProxy);
 
             // optionales ConnectAsync aufrufen, falls vorhanden
             try
@@ -5362,7 +5361,7 @@ rp.connect();
     {
         try
         {
-            var asm = typeof(Ark).Assembly;
+            var asm = typeof(RustPlus).Assembly;
             var appRequestType = asm.GetTypes().FirstOrDefault(t => t.Name == "AppRequest");
             if (appRequestType == null) return (false, "AppRequest not found");
 
@@ -5455,7 +5454,7 @@ rp.connect();
 
         try
         {
-            var asm = typeof(Ark).Assembly;
+            var asm = typeof(RustPlus).Assembly;
             var reqType = asm.GetTypes().FirstOrDefault(x => x.Name.Equals("AppRequest", StringComparison.OrdinalIgnoreCase));
             var emptyType = asm.GetTypes().FirstOrDefault(x => x.Name.Equals("AppEmpty", StringComparison.OrdinalIgnoreCase));
 
@@ -5580,7 +5579,7 @@ rp.connect();
         // 3) Fallback B: Contracts GetEntityInfo
         try
         {
-            var asm = typeof(Ark).Assembly;
+            var asm = typeof(RustPlus).Assembly;
             var reqType = asm.GetTypes().FirstOrDefault(x => x.Name == "AppRequest");
             var emptyType = asm.GetTypes().FirstOrDefault(x => x.Name == "AppEmpty");
             if (reqType != null && emptyType != null)
@@ -6219,7 +6218,7 @@ rp.connect();
         }
 
         // 2) Fallback über Contracts
-        var asm = typeof(Ark).Assembly;
+        var asm = typeof(RustPlus).Assembly;
         var reqType = asm.GetTypes().FirstOrDefault(x => x.Name == "AppRequest");
         var emptyType = asm.GetTypes().FirstOrDefault(x => x.Name == "AppEmpty");
         if (reqType != null && emptyType != null)
@@ -6264,7 +6263,7 @@ rp.connect();
         // 2) Zusatz: Contracts-Poke für Storage
         try
         {
-            var asm = typeof(Ark).Assembly;
+            var asm = typeof(RustPlus).Assembly;
             var reqType = asm.GetTypes().FirstOrDefault(x => x.Name == "AppRequest");
             var emptyType = asm.GetTypes().FirstOrDefault(x => x.Name == "AppEmpty");
             if (reqType != null && emptyType != null)

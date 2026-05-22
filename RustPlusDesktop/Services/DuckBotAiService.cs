@@ -399,12 +399,12 @@ public class AiContext
     public string PlayerTier { get; set; } = "player";
     public string? TribeId { get; set; }
     public string SessionId { get; set; } = "";
-    public Tier ParseTier() => PlayerTier.ToLower() switch
+    public DuckBotAgent.PermissionTier Tier => PlayerTier.ToLower() switch
     {
-        "admin" => Tier.Admin,
-        "mod" => Tier.Mod,
-        "vip" => Tier.Vip,
-        _ => Tier.Player
+        "admin" => DuckBotAgent.PermissionTier.Admin,
+        "mod" => DuckBotAgent.PermissionTier.Mod,
+        "vip" => DuckBotAgent.PermissionTier.Vip,
+        _ => DuckBotAgent.PermissionTier.Player
     };
 }
 

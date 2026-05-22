@@ -202,7 +202,7 @@ public class McpBridgeClient : IDisposable
         var payload = new
         {
             type = "event",
-            event = eventType,
+            @event = eventType,
             data = eventData
         };
 

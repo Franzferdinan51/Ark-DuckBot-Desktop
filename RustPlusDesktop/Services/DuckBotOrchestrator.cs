@@ -34,7 +34,7 @@ public class DuckBotOrchestrator : IDisposable
     private readonly DuckBotHandler _handler;
     private readonly DuckBotKnowledge _knowledge;
 
-    private readonly Dictionary<string, PlayerSession> _sessions = new();
+    private readonly Dictionary<string, AiPlayerSession> _sessions = new();
     private McpBridgeClient? _mcpBridge;
 
     public event EventHandler<string>? ResponseGenerated;
@@ -143,7 +143,7 @@ public class DuckBotOrchestrator : IDisposable
             var sessionKey = $"{playerName}:{tribeId ?? "none"}";
             if (!_sessions.TryGetValue(sessionKey, out var session))
             {
-                session = new PlayerSession
+                session = new AiPlayerSession
                 {
                     PlayerId = sessionKey,
                     PlayerName = playerName,
@@ -200,7 +200,7 @@ public class DuckBotOrchestrator : IDisposable
     {
         var ctx = new SkillContext
         {
-            PlayerId = $"{playerName}:{eventData.TryGetValue("tribe_id", out var tid) ? tid : "none"}",
+            PlayerId = $"{playerName}:{(eventData.TryGetValue("tribe_id", out var tid) ? tid : "none")}",
             PlayerName = playerName,
             PlayerTier = playerTier,
             TribeId = eventData.TryGetValue("tribe_id", out var t) ? t?.ToString() : null,
@@ -235,7 +235,7 @@ public class DuckBotOrchestrator : IDisposable
     /// <summary>
     /// Check rate limit for player session.
     /// </summary>
-    private bool CheckRateLimit(PlayerSession session)
+    private bool CheckRateLimit(AiPlayerSession session)
     {
         var (limit, window) = session.PlayerTier.ToLower() switch
         {
@@ -331,7 +331,7 @@ public class DuckBotOrchestrator : IDisposable
     }
 }
 
-public class PlayerSession
+public class AiPlayerSession
 {
     public string PlayerId { get; set; } = "";
     public string PlayerName { get; set; } = "";

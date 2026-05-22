@@ -19,7 +19,7 @@ public class ArkApiClient : IDisposable
     public event EventHandler<ArkPlayerListEventArgs>? PlayersUpdated;
     public event EventHandler<ArkTribeEventArgs>? TribeUpdated;
     public event EventHandler<ArkChatMessageEventArgs>? ChatMessageReceived;
-    public event EventHandler<Ark DinoEventArgs>? DinoUpdated;
+    public event EventHandler<DinoEventArgs>? DinoUpdated;
     public event EventHandler<string>? ConnectionStatusChanged;
     public event EventHandler<string>? ErrorOccurred;
 

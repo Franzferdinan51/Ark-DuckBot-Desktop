@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace ArkDuckBot.Services;
@@ -33,7 +34,7 @@ public class DuckBotAgent : IDisposable
     public string IdentityMd { get; set; } = "";    // Agent identity
 
     // Skill registry - hermes-agent inspired
-    private readonly Dictionary<string, Skill> _skills = new();
+    private readonly Dictionary<string, AgentSkill> _skills = new();
 
     // Tool registry - sheldon-inspired with @tool decorator
     private readonly Dictionary<string, Tool> _tools = new();
@@ -51,7 +52,7 @@ public class DuckBotAgent : IDisposable
     private const int MaxIterations = 25;
 
     public event EventHandler<string>? LogMessage;
-    public event EventHandler<Skill>? SkillLearned;
+    public event EventHandler<AgentSkill>? SkillLearned;
     public event EventHandler<ToolCallEventArgs>? ToolCalled;
 
     public DuckBotAgent()
@@ -160,10 +161,10 @@ public class DuckBotAgent : IDisposable
     /// Register a new skill with YAML frontmatter metadata.
     /// Skill format inspired by hermes-agent SKILL.md standard.
     /// </summary>
-    public void RegisterSkill(string name, string description, Func<SkillContext, Task<string>> action,
+    public void RegisterSkill(string name, string description, Func<AgentSkillContext, Task<string>> action,
         string[]? triggers = null, string? yamlMetadata = null)
     {
-        var skill = new Skill
+        var skill = new AgentSkill
         {
             Name = name,
             Description = description,
@@ -211,7 +212,7 @@ Automatically learned from player interaction.
 Confirm the action completed successfully.
 ";
 
-        var skill = new Skill
+        var skill = new AgentSkill
         {
             Name = name,
             Description = description,
@@ -231,7 +232,7 @@ Confirm the action completed successfully.
     /// <summary>
     /// Invoke a skill by trigger or name.
     /// </summary>
-    public async Task<string> InvokeSkillAsync(string trigger, SkillContext context)
+    public async Task<string> InvokeSkillAsync(string trigger, AgentSkillContext context)
     {
         var skill = _skills.Values.FirstOrDefault(s =>
             s.Triggers.Any(t => t.Equals(trigger, StringComparison.OrdinalIgnoreCase)));
@@ -281,7 +282,7 @@ Confirm the action completed successfully.
                 try
                 {
                     var json = File.ReadAllText(file);
-                    var skill = JsonSerializer.Deserialize<Skill>(json);
+                    var skill = JsonSerializer.Deserialize<AgentSkill>(json);
                     if (skill != null && !string.IsNullOrEmpty(skill.Name))
                     {
                         _skills[skill.Name] = skill;
@@ -296,7 +297,7 @@ Confirm the action completed successfully.
         }
     }
 
-    private void SaveSkill(Skill skill)
+    private void SaveSkill(AgentSkill skill)
     {
         try
         {
@@ -764,7 +765,7 @@ Confirm the action completed successfully.
 
 #region Supporting Types
 
-public class Skill
+public class AgentSkill
 {
     public string Name { get; set; } = "";
     public string Description { get; set; } = "";
@@ -779,10 +780,10 @@ public class Skill
 
     // Runtime - not persisted
     [JsonIgnore]
-    public Func<SkillContext, Task<string>>? Action { get; set; }
+    public Func<AgentSkillContext, Task<string>>? Action { get; set; }
 }
 
-public class SkillContext
+public class AgentSkillContext
 {
     public string PlayerId { get; set; } = "";
     public string PlayerName { get; set; } = "";

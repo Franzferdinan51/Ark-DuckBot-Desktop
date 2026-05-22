@@ -1,8 +1,9 @@
 using System.Windows.Controls;
 using System.Windows.Input;
+using ArkDuckBot.Services;
 using ArkDuckBot.ViewModels;
 
-namespace ArkDuckBot.Views.MainWindow.AI;
+namespace ArkDuckBot.Views.Panels;
 
 public partial class AIChatPanel : UserControl
 {
