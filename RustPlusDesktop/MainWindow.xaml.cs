@@ -63,6 +63,7 @@ public partial class MainWindow : ui.FluentWindow
 
     private DateTime _lastPairingPingAt = DateTime.MinValue;
     private readonly IRustPlusClient _rust;  // Interface statt fester Klasse
+    private readonly McpBridgeClient _mcpBridge = new();  // DuckBot MCP Bridge for AI chat
     private WebView2? _webView;
     private IPairingListener _pairing;
     private readonly Dictionary<uint, DateTime> _entityPairSeen = new();

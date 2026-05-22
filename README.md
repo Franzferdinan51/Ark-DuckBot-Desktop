@@ -1,13 +1,13 @@
 # ArkDuckBot Desktop
 
-A desktop companion application for **ARK: Survival Ascended** servers, providing real-time map tracking, AI chat integration, and server management features.
+A desktop companion application for **ARK: Survival Ascended** servers, providing real-time map tracking, AI chat integration via DuckBot, and server management features.
 
 ## Overview
 
-ArkDuckBot is a WPF desktop application that connects to ARK: Survival Ascended servers running the **DuckBot** mod. It provides:
+ArkDuckBot Desktop is a WPF desktop application that connects to ARK: Survival Ascended servers running the **DuckBot mod**. It provides:
 
 - **Real-time Map Tracking** - Monitor players, dinosaurs, and events on ARK maps
-- **AI Chat Integration** - Connect to Sheldon AI-powered chat via the DuckBot MCP bridge
+- **AI Chat Integration** - Connect to DuckBot AI-powered chat via the MCP Bridge
 - **Server Pairing** - Connect to servers using `arkduckbot://` protocol links
 - **Player Tracking** - Monitor online players, tribe info, and server status
 - **System Tray** - Background operation with tray icon and notifications
@@ -15,67 +15,99 @@ ArkDuckBot is a WPF desktop application that connects to ARK: Survival Ascended 
 ## Connection Architecture
 
 ```
-┌──────────────────────────────────────────────────────────┐
-│                   ArkDuckBot Desktop (WPF)               │
-├──────────────────────────────────────────────────────────┤
-│  ArkApiClient ←──────→ ARK Server (ServerAPI Plugin)    │
-│  McpBridgeClient ←───→ DuckBot MCP Bridge (Python)       │
-│                          ↓                               │
-│                       LLM Provider (OpenRouter/Claude)   │
-└──────────────────────────────────────────────────────────┘
+┌─────────────────────────────────────────────────────────────────┐
+│                ArkDuckBot Desktop (WPF App)                     │
+├─────────────────────────────────────────────────────────────────┤
+│  ArkApiClient ←──────→ ARK Server (DuckBot ServerAPI Plugin)     │
+│  McpBridgeClient ←──→ DuckBot MCP Bridge (Python)               │
+│                          ↓                                      │
+│                       LLM Provider (OpenRouter/Claude/Gemini)   │
+└─────────────────────────────────────────────────────────────────┘
 ```
+
+### How It Works
+
+1. **DuckBot ServerAPI Plugin** (C++): Runs on the ARK server, hooks into game events, provides chat commands
+2. **MCP Bridge** (Python): AI brain that processes natural language, runs the agentic loop with LLM providers
+3. **ArkDuckBot Desktop**: Desktop client that connects to both the ServerAPI (for game data) and MCP Bridge (for AI chat)
 
 ## Requirements
 
 - .NET 8.0 Runtime (Windows)
-- ARK: Survival Ascended server with [DuckBot mod](https://github.com/Franzferdinan51/DuckBot-For-ark)
-- WindowsGSM with [ArkSAwithServerAPI](https://github.com/ohmcodes/WindowsGSM.ArkSAwithServerAPI)
+- ARK: Survival Ascended server with DuckBot mod installed
+- DuckBot MCP Bridge running (for AI features)
 
 ## Installation
 
-1. Download the latest `ArkDuckBot-Setup.exe` from [Releases](https://github.com/Franzferdinan51/Ark-DuckBot-Desktop/releases)
-2. Run the installer
-3. Launch ArkDuckBot
+### 1. Server Setup: Install DuckBot Mod
 
-## Server Setup
+Follow the guide at [DuckBot-For-ark](https://github.com/Franzferdinan51/DuckBot-For-ark/tree/main/mod):
 
-### 1. Install DuckBot Mod
+```bash
+# 1. Install Visual Studio 2022 with C++ desktop workload
+# 2. Clone AsaApi as a sibling directory
+# 3. Build DuckBot.sln (Release x64)
+# 4. Copy Binaries/Release/DuckBot.dll to ArkApi/Plugins/DuckBot/
+```
 
-Follow the instructions at [DuckBot-For-ark](https://github.com/Franzferdinan51/DuckBot-For-ark)
+### 2. Server Setup: Install MCP Bridge
 
-### 2. Install WindowsGSM + ArkSAwithServerAPI
+Follow the guide at [DuckBot-For-ark/mcp-bridge](https://github.com/Franzferdinan51/DuckBot-For-ark/tree/main/mcp-bridge):
 
-Follow the instructions at [WindowsGSM.ArkSAwithServerAPI](https://github.com/ohmcodes/WindowsGSM.ArkSAwithServerAPI)
+```bash
+cd mcp-bridge
+pip install -e .
+sheldon-bridge run
+```
 
-### 3. Pair with Server
+The bridge default port is `8443`. Configure your LLM provider in `config.json`.
+
+### 3. Desktop App Setup
+
+Download `ArkDuckBot-Setup.exe` from [Releases](https://github.com/Franzferdinan51/Ark-DuckBot-Desktop/releases) or build from source:
+
+```bash
+git clone https://github.com/Franzferdinan51/Ark-DuckBot-Desktop.git
+cd Ark-DuckBot-Desktop/ArkDuckBotDesktop
+dotnet restore
+dotnet build
+dotnet run
+```
+
+### 4. Connect to Server
 
 Use the in-game pairing command or use an `arkduckbot://` link:
 ```
 arkduckbot://SERVER_IP:SERVER_PORT
 ```
 
-## Features
+In the desktop app settings, configure:
+- **ARK Server API**: Host/port of your ARK server (default: 27020)
+- **MCP Bridge**: Host/port of your MCP Bridge (default: localhost:8443)
+- **Shared Secret**: The auth token configured in your MCP Bridge
 
-### Map Tracking
-- Real-time player positions on ARK maps
-- Dinosaur spawn tracking
-- Supply drop and event notifications
-- Tribe territory markers
+## DuckBot Commands
 
-### AI Chat (Sheldon AI)
-- Natural language AI assistant
-- Player lookups (dinosaurs, items, engrams)
-- Admin commands (spawn, give items, teleport)
-- Permission-tier-based tool access
-
-### DuckBot Commands
 The app integrates with DuckBot's 39+ chat commands:
-- **Economy**: `/bal`, `/pay`, `/daily`, `/work`, `/coinflip`
-- **Teleport**: `/home`, `/sethome`, `/tpr`, `/tpaccept`, `/warp`
-- **Tribe**: `/tribe`, `/tdinos`, `/tribealert`, `/marker`
-- **Moderation**: `/kick`, `/ban`, `/unban`, `/mute`, `/slay`
-- **Kits**: `/kits`, `/kit`
-- **AI**: `/aibrain`, `/aireset`
+
+| Category | Commands | Description |
+|----------|----------|-------------|
+| **Economy** | `/bal`, `/pay`, `/daily`, `/work`, `/coinflip` | Player economy system |
+| **Teleport** | `/home`, `/sethome`, `/tpr`, `/tpaccept`, `/warp` | Teleportation commands |
+| **Tribe** | `/tribe`, `/tdinos`, `/tribealert`, `/marker`, `/gridmap` | Tribe management |
+| **Moderation** | `/kick`, `/ban`, `/unban`, `/mute`, `/unmute`, `/slay` | Admin tools |
+| **Kits** | `/kits`, `/kit` | Kit system |
+| **Events** | `/events`, `/event`, `/drop` | Event notifications |
+| **AI** | `/aibrain`, `/aireset` | AI chat integration |
+
+## AI Chat (Sheldon AI)
+
+The AI chat panel connects to your configured MCP Bridge and LLM provider. It supports:
+
+- **Natural Language Commands**: "Spawn me a Rex level 150"
+- **Permission Tiers**: user/vip/mod/admin with different access levels
+- **Tool Access**: Spawn dinos, teleport, give items, manage tribe
+- **Multi-LLM**: OpenRouter, Claude, GPT-4, Gemini, and local options
 
 ## Configuration
 
@@ -83,26 +115,11 @@ Settings are stored in `%APPDATA%\ArkDuckBot\`
 
 ### Key Settings
 - `mcp_host` / `mcp_port` - DuckBot MCP Bridge connection
+- `mcp_secret` - Shared secret for MCP Bridge authentication
+- `ark_host` / `ark_port` - ARK Server API connection
 - `announce_*` - Notification preferences
 - `auto_start` - Launch on Windows startup
 - `minimize_to_tray` - Minimize to system tray
-
-## Building from Source
-
-```bash
-# Clone the repository
-git clone https://github.com/Franzferdinan51/Ark-DuckBot-Desktop.git
-
-# Navigate to project
-cd Ark-DuckBot-Desktop/ArkDuckBotDesktop
-
-# Restore and build
-dotnet restore
-dotnet build
-
-# Run
-dotnet run
-```
 
 ## Tech Stack
 

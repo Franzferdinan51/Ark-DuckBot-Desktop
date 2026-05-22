@@ -1,11 +1,11 @@
-using RustPlusDesk.Models;
-using RustPlusDesk.Services;
+using ArkDuckBot.Models;
+using ArkDuckBot.Services;
 using System;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Threading;
 
-namespace RustPlusDesk.Views;
+namespace ArkDuckBot.Views;
 
 public partial class MainWindow
 {
@@ -17,6 +17,11 @@ public partial class MainWindow
     private async Task HardResetAsync(bool reconnect = false)
     {
         _connectedProfile = null;
+
+        // Disconnect MCP Bridge on hard reset
+        try { _mcpBridge.Disconnect(); } catch { }
+        TrackingService.IsMcpConnected = false;
+
         // 1) Laufende Polls/Tokens abbrechen
         try { StopDynPolling(clearKnown: !reconnect); } catch { }
         try { StopTeamPolling(); } catch { }

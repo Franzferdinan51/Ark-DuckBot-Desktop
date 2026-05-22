@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Input;
 
 namespace ArkDuckBot.ViewModels;
 
@@ -19,6 +20,16 @@ public class AiChatViewModel : INotifyPropertyChanged
     public event PropertyChangedEventHandler? PropertyChanged;
 
     public ObservableCollection<ChatMessage> Messages { get; } = new();
+
+    // Commands
+    public ICommand SendPromptCommand { get; }
+    public ICommand ClearChatCommand { get; }
+
+    public AiChatViewModel()
+    {
+        SendPromptCommand = new SimpleCommand(async _ => await SendPromptAsync(), _ => !IsProcessing && !string.IsNullOrWhiteSpace(CurrentPrompt));
+        ClearChatCommand = new SimpleCommand(_ => ClearChat());
+    }
 
     public string CurrentPrompt
     {
@@ -60,8 +71,26 @@ public class AiChatViewModel : INotifyPropertyChanged
         _mcpClient.AiResponseReceived += OnAiResponse;
         _mcpClient.ErrorOccurred += OnMcpError;
         _mcpClient.ConnectionStatusChanged += OnConnectionChanged;
+        _mcpClient.ThinkingStateChanged += OnThinkingStateChanged;
 
         AddSystemMessage("AI Chat initialized. DuckBot MCP Bridge required for AI features.");
+    }
+
+    private void OnThinkingStateChanged(object? sender, string state)
+    {
+        Application.Current.Dispatcher.Invoke(() =>
+        {
+            if (!string.IsNullOrEmpty(state))
+            {
+                StatusMessage = state;
+                IsProcessing = true;
+            }
+            else
+            {
+                IsProcessing = false;
+                StatusMessage = "Ready";
+            }
+        });
     }
 
     private void OnConnectionChanged(object? sender, string status)

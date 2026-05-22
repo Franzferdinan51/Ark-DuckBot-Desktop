@@ -8,39 +8,60 @@ using System.Threading.Tasks;
 
 namespace ArkDuckBot.Services;
 
+/// <summary>
+/// WebSocket client for DuckBot MCP Bridge.
+/// Connects to the Python bridge server that provides AI chat via LLM providers.
+///
+/// Protocol: https://github.com/Franzferdinan51/DuckBot-For-ark/tree/main/mcp-bridge
+/// </summary>
 public class McpBridgeClient : IDisposable
 {
     private ClientWebSocket? _webSocket;
     private CancellationTokenSource? _cts;
     private string _host = "localhost";
-    private int _port = 27071;
+    private int _port = 8443;
+    private string _sharedSecret = "";
     private readonly Queue<Func<JsonElement, Task>> _pendingRequests = new();
     private int _requestId = 0;
+
+    // Authenticated player context
+    public string? PlayerId { get; private set; }
+    public string? PlayerName { get; private set; }
+    public string? PlayerTier { get; private set; }
+    public string? TribeId { get; private set; }
+    public bool IsAuthenticated { get; private set; }
 
     public event EventHandler<string>? MessageReceived;
     public event EventHandler<string>? ConnectionStatusChanged;
     public event EventHandler<string>? ErrorOccurred;
     public event EventHandler<AiResponseEventArgs>? AiResponseReceived;
+    public event EventHandler<string>? ThinkingStateChanged;
+    public event EventHandler<GameEventArgs>? GameEventReceived;
+    public event EventHandler<AuthSuccessEventArgs>? AuthSuccessReceived;
 
     public bool IsConnected => _webSocket?.State == WebSocketState.Open;
 
-    public async Task ConnectAsync(string? host = null, int? port = null, CancellationToken ct = default)
+    public async Task ConnectAsync(string? host = null, int? port = null, string? sharedSecret = null, CancellationToken ct = default)
     {
         if (host != null) _host = host;
         if (port != null) _port = port.Value;
+        if (sharedSecret != null) _sharedSecret = sharedSecret;
 
         Disconnect();
 
         _webSocket = new ClientWebSocket();
         _cts = CancellationTokenSource.CreateLinkedTokenSource(ct);
 
-        var uri = new Uri($"ws://{_host}:{_port}/mcp");
+        var uri = new Uri($"ws://{_host}:{_port}");
 
         try
         {
             ConnectionStatusChanged?.Invoke(this, "Connecting to DuckBot MCP Bridge...");
             await _webSocket.ConnectAsync(uri, _cts.Token);
-            ConnectionStatusChanged?.Invoke(this, "Connected to DuckBot MCP Bridge");
+
+            // Send authentication
+            await SendAuthAsync();
+
             _ = ReceiveLoopAsync();
         }
         catch (Exception ex)
@@ -50,8 +71,31 @@ public class McpBridgeClient : IDisposable
         }
     }
 
+    private async Task SendAuthAsync()
+    {
+        if (_webSocket?.State != WebSocketState.Open)
+            throw new InvalidOperationException("Not connected");
+
+        var payload = new
+        {
+            type = "auth",
+            token = _sharedSecret,
+            player = new
+            {
+                id = "desktop_client",
+                name = "ArkDuckBot",
+                tier = "admin"
+            }
+        };
+
+        var json = JsonSerializer.Serialize(payload);
+        var bytes = Encoding.UTF8.GetBytes(json);
+        await _webSocket.SendAsync(new ArraySegment<byte>(bytes), WebSocketMessageType.Text, true, _cts?.Token ?? default);
+    }
+
     public void Disconnect()
     {
+        IsAuthenticated = false;
         try { _cts?.Cancel(); } catch { }
         try { _webSocket?.Dispose(); } catch { }
         _webSocket = null;
@@ -63,14 +107,22 @@ public class McpBridgeClient : IDisposable
         if (_webSocket?.State != WebSocketState.Open)
             throw new InvalidOperationException("MCP Bridge not connected");
 
+        if (!IsAuthenticated)
+            throw new InvalidOperationException("Not authenticated with MCP Bridge");
+
         var requestId = Interlocked.Increment(ref _requestId);
         var payload = new
         {
-            type = "ai_request",
+            type = "player_message",
             id = requestId,
-            prompt,
+            message = prompt,
             context = context ?? "",
-            provider = "auto"
+            sender = new
+            {
+                id = PlayerId ?? "desktop_client",
+                name = PlayerName ?? "ArkDuckBot",
+                tier = PlayerTier ?? "admin"
+            }
         };
 
         var json = JsonSerializer.Serialize(payload);
@@ -100,16 +152,22 @@ public class McpBridgeClient : IDisposable
         }
     }
 
-    public async Task SendCommandAsync(string command, Dictionary<string, string>? args = null, CancellationToken ct = default)
+    public async Task SendChatMessageAsync(string message, CancellationToken ct = default)
     {
-        if (_webSocket?.State != WebSocketState.Open)
-            throw new InvalidOperationException("MCP Bridge not connected");
+        if (_webSocket?.State != WebSocketState.Open || !IsAuthenticated)
+            throw new InvalidOperationException("MCP Bridge not connected or authenticated");
 
         var payload = new
         {
-            type = "command",
-            command,
-            args = args ?? new Dictionary<string, string>()
+            type = "player_message",
+            id = Interlocked.Increment(ref _requestId),
+            message = $"/{message}",
+            sender = new
+            {
+                id = PlayerId ?? "desktop_client",
+                name = PlayerName ?? "ArkDuckBot",
+                tier = PlayerTier ?? "admin"
+            }
         };
 
         var json = JsonSerializer.Serialize(payload);
@@ -117,22 +175,48 @@ public class McpBridgeClient : IDisposable
         await _webSocket.SendAsync(new ArraySegment<byte>(bytes), WebSocketMessageType.Text, true, ct);
     }
 
-    public async Task RequestCommandListAsync(CancellationToken ct = default)
+    public async Task SendPositionUpdateAsync(double x, double y, double z, CancellationToken ct = default)
     {
-        await SendCommandAsync("list_commands", null, ct);
+        if (_webSocket?.State != WebSocketState.Open || !IsAuthenticated)
+            return;
+
+        var payload = new
+        {
+            type = "position_update",
+            position = new { x, y, z }
+        };
+
+        var json = JsonSerializer.Serialize(payload);
+        var bytes = Encoding.UTF8.GetBytes(json);
+        await _webSocket.SendAsync(new ArraySegment<byte>(bytes), WebSocketMessageType.Text, true, ct);
     }
 
-    public async Task ExecuteChatCommandAsync(string chatCommand, CancellationToken ct = default)
+    public async Task SendGameEventAsync(string eventType, Dictionary<string, object> eventData, CancellationToken ct = default)
     {
-        var parts = chatCommand.TrimStart('/').Split(' ', 2);
-        var cmd = parts[0];
-        var args = parts.Length > 1 ? parts[1] : "";
+        if (_webSocket?.State != WebSocketState.Open || !IsAuthenticated)
+            return;
 
-        await SendCommandAsync("execute", new Dictionary<string, string>
+        var payload = new
         {
-            { "command", cmd },
-            { "args", args }
-        }, ct);
+            type = "event",
+            event = eventType,
+            data = eventData
+        };
+
+        var json = JsonSerializer.Serialize(payload);
+        var bytes = Encoding.UTF8.GetBytes(json);
+        await _webSocket.SendAsync(new ArraySegment<byte>(bytes), WebSocketMessageType.Text, true, ct);
+    }
+
+    public async Task SendPingAsync()
+    {
+        if (_webSocket?.State != WebSocketState.Open)
+            return;
+
+        var payload = new { type = "ping" };
+        var json = JsonSerializer.Serialize(payload);
+        var bytes = Encoding.UTF8.GetBytes(json);
+        await _webSocket.SendAsync(new ArraySegment<byte>(bytes), WebSocketMessageType.Text, true, _cts?.Token ?? default);
     }
 
     private async Task ReceiveLoopAsync()
@@ -150,6 +234,7 @@ public class McpBridgeClient : IDisposable
                 {
                     await _webSocket.CloseAsync(WebSocketCloseStatus.NormalClosure, "", default);
                     ConnectionStatusChanged?.Invoke(this, "Disconnected from MCP Bridge");
+                    IsAuthenticated = false;
                     break;
                 }
 
@@ -185,24 +270,60 @@ public class McpBridgeClient : IDisposable
 
             switch (type)
             {
-                case "ai_response":
-                    var id = root.TryGetProperty("id", out var reqId) ? reqId.GetInt32() : 0;
-                    var response = root.TryGetProperty("response", out var resp) ? resp.GetString() ?? "" : "";
-                    AiResponseReceived?.Invoke(this, new AiResponseEventArgs(id, response));
+                case "auth_success":
+                    // Authentication successful, store player context
+                    if (root.TryGetProperty("player", out var player))
+                    {
+                        PlayerId = player.TryGetProperty("id", out var id) ? id.GetString() : null;
+                        PlayerName = player.TryGetProperty("name", out var name) ? name.GetString() : null;
+                        PlayerTier = player.TryGetProperty("tier", out var tier) ? tier.GetString() : null;
+                        TribeId = player.TryGetProperty("tribe", out var tribe) ? tribe.GetString() : null;
+                    }
+                    IsAuthenticated = true;
+                    ConnectionStatusChanged?.Invoke(this, $"Connected as {PlayerName} ({PlayerTier})");
+                    AuthSuccessReceived?.Invoke(this, new AuthSuccessEventArgs(PlayerTier ?? "user"));
                     break;
 
-                case "command_result":
-                    var success = root.TryGetProperty("success", out var ok) && ok.GetBoolean();
-                    var resultMsg = root.TryGetProperty("message", out var msg) ? msg.GetString() ?? "" : "";
-                    MessageReceived?.Invoke(this, success ? $"[OK] {resultMsg}" : $"[ERROR] {resultMsg}");
+                case "thinking":
+                    // AI is processing
+                    ThinkingStateChanged?.Invoke(this, "Thinking...");
+                    break;
+
+                case "reply":
+                    // AI response with stats
+                    var id = root.TryGetProperty("id", out var reqId) ? reqId.GetInt32() : 0;
+                    var response = root.TryGetProperty("response", out var resp) ? resp.GetString() ?? "" : "";
+                    var stats = root.TryGetProperty("stats", out var st) ? st : default;
+                    ThinkingStateChanged?.Invoke(this, "");
+                    AiResponseReceived?.Invoke(this, new AiResponseEventArgs(id, response));
+                    MessageReceived?.Invoke(this, $"[AI] {response}");
                     break;
 
                 case "error":
                     if (root.TryGetProperty("message", out var errMsg))
+                    {
                         ErrorOccurred?.Invoke(this, errMsg.GetString() ?? "Unknown MCP error");
+                    }
+                    ThinkingStateChanged?.Invoke(this, "");
                     break;
 
                 case "pong":
+                    break;
+
+                case "event":
+                    // Game event from plugin (dino tamed, player joined, etc.)
+                    if (root.TryGetProperty("event", out var evt) && root.TryGetProperty("data", out var data))
+                    {
+                        GameEventReceived?.Invoke(this, new GameEventArgs(evt.GetString() ?? "", data.GetRawText()));
+                    }
+                    break;
+
+                case "player_message":
+                    // Echo of our own message or broadcast
+                    if (root.TryGetProperty("message", out var msg))
+                    {
+                        MessageReceived?.Invoke(this, msg.GetString() ?? "");
+                    }
                     break;
 
                 default:
@@ -231,5 +352,25 @@ public class AiResponseEventArgs : EventArgs
     {
         RequestId = requestId;
         Response = response;
+    }
+}
+
+public class AuthSuccessEventArgs : EventArgs
+{
+    public string PlayerTier { get; }
+    public AuthSuccessEventArgs(string playerTier)
+    {
+        PlayerTier = playerTier;
+    }
+}
+
+public class GameEventArgs : EventArgs
+{
+    public string EventType { get; }
+    public string EventData { get; }
+    public GameEventArgs(string eventType, string eventData)
+    {
+        EventType = eventType;
+        EventData = eventData;
     }
 }

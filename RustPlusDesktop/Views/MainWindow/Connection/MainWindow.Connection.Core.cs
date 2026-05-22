@@ -244,6 +244,22 @@ public partial class MainWindow
             AppendLog("Connected.");
             _connectedProfile = _vm.Selected;
 
+            // Connect to DuckBot MCP Bridge for AI chat features
+            try
+            {
+                await _mcpBridge.ConnectAsync(
+                    TrackingService.McpHost ?? "localhost",
+                    TrackingService.McpPort > 0 ? TrackingService.McpPort : 8443,
+                    TrackingService.McpSecret ?? "");
+                TrackingService.IsMcpConnected = _mcpBridge.IsConnected;
+                AppendLog($"MCP Bridge connected: {_mcpBridge.IsConnected}");
+            }
+            catch (Exception ex)
+            {
+                AppendLog($"MCP Bridge connection skipped: {ex.Message}");
+                TrackingService.IsMcpConnected = false;
+            }
+
             TrackingService.StartPolling(_vm.Selected.Host ?? "", _vm.Selected.Port, _vm.Selected.Name ?? "", _vm.Selected.BattleMetricsId);
 
             // Shorter initial delay — just enough for the WS to be ready

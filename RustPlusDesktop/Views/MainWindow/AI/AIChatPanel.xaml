@@ -30,21 +30,22 @@
 
                 <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
                     <ui:SymbolIcon Symbol="Brain24" FontSize="24" Margin="0,0,8,0"/>
-                    <TextBlock Text="AI Chat" FontSize="16" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                    <TextBlock Text="Sheldon AI" FontSize="16" FontWeight="SemiBold" VerticalAlignment="Center"/>
                 </StackPanel>
-
-                <ComboBox Grid.Column="1"
-                          ItemsSource="{Binding AvailableProviders}"
-                          SelectedItem="{Binding SelectedProvider}"
-                          Width="100"
-                          Margin="8,0,0,0"/>
 
                 <ui:Button Grid.Column="1"
                            Icon="{ui:SymbolIcon Delete24}"
                            ToolTip="Clear chat"
                            Command="{Binding ClearChatCommand}"
-                           Margin="115,0,0,0"
+                           Margin="8,0,0,0"
                            Appearance="Secondary"/>
+
+                <!-- Thinking indicator -->
+                <StackPanel Grid.Column="1" Orientation="Horizontal" Margin="50,0,0,0" VerticalAlignment="Center"
+                            Visibility="{Binding IsProcessing, Converter={StaticResource BoolToVisibility}}">
+                    <ui:ProgressRing IsIndeterminate="True" Width="16" Height="16"/>
+                    <TextBlock Text="Thinking..." FontSize="11" Margin="6,0,0,0" Opacity="0.7"/>
+                </StackPanel>
             </Grid>
         </Border>
 
@@ -84,7 +85,7 @@
                 </Grid.ColumnDefinitions>
 
                 <ui:TextBox Grid.Column="0"
-                            PlaceholderText="Ask the AI anything..."
+                            PlaceholderText="Ask Sheldon anything about ARK..."
                             Text="{Binding CurrentPrompt, UpdateSourceTrigger=PropertyChanged}"
                             x:Name="PromptInput"/>
 
@@ -92,7 +93,6 @@
                            Content="Send"
                            Icon="{ui:SymbolIcon Send24}"
                            Command="{Binding SendPromptCommand}"
-                           IsEnabled="{Binding IsNotProcessing}"
                            Margin="8,0,0,0"/>
             </Grid>
         </Border>

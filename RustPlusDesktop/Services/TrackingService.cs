@@ -105,6 +105,10 @@ public class TrackingSettings
     public DateTime? FcmExpiresAt { get; set; }
     public bool AnnounceTracking { get; set; } = false;
     public Dictionary<string, int> LearnedQueryPorts { get; set; } = new();
+    public string? McpHost { get; set; } = "localhost";
+    public int McpPort { get; set; } = 8443;
+    public string? McpSecret { get; set; } = "";
+    public string? AiProvider { get; set; } = "openrouter";
 }
 
 
@@ -517,6 +521,34 @@ public static class TrackingService
         get => _settings.AnnounceDodo;
         set { _settings.AnnounceDodo = value; SaveDB(); }
     }
+
+    // DuckBot MCP Bridge settings
+    public static string? McpHost
+    {
+        get => _settings.McpHost;
+        set { _settings.McpHost = value; SaveDB(); }
+    }
+
+    public static int McpPort
+    {
+        get => _settings.McpPort > 0 ? _settings.McpPort : 8443;
+        set { _settings.McpPort = value; SaveDB(); }
+    }
+
+    public static string? McpSecret
+    {
+        get => _settings.McpSecret;
+        set { _settings.McpSecret = value; SaveDB(); }
+    }
+
+    public static string? AiProvider
+    {
+        get => _settings.AiProvider;
+        set { _settings.AiProvider = value; SaveDB(); }
+    }
+
+    [System.Text.Json.Serialization.JsonIgnore]
+    public static bool IsMcpConnected { get; set; }
     public static bool AnnounceReaper
     {
         get => _settings.AnnounceReaper;
