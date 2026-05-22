@@ -36,6 +36,13 @@ namespace ArkDuckBot.Views
             TxtMcpHost.Text = McpHost;
             TxtMcpPort.Text = McpPort;
 
+            // Load saved shared secret (PasswordBox can't be bound, set in code)
+            var savedSecret = TrackingService.McpSecret;
+            if (!string.IsNullOrEmpty(savedSecret))
+            {
+                TxtMcpSecret.Password = savedSecret;
+            }
+
             // Set AI provider combobox
             foreach (System.Windows.Controls.ComboBoxItem item in CmbAiProvider.Items)
             {
