@@ -20,6 +20,7 @@ public class McpBridgeClient : IDisposable
     private CancellationTokenSource? _cts;
     private string _host = "localhost";
     private int _port = 8443;
+    private int _adminPort = 8444;
     private string _sharedSecret = "";
     private readonly Queue<Func<JsonElement, Task>> _pendingRequests = new();
     private int _requestId = 0;
@@ -41,10 +42,11 @@ public class McpBridgeClient : IDisposable
 
     public bool IsConnected => _webSocket?.State == WebSocketState.Open;
 
-    public async Task ConnectAsync(string? host = null, int? port = null, string? sharedSecret = null, CancellationToken ct = default)
+    public async Task ConnectAsync(string? host = null, int? port = null, int? adminPort = null, string? sharedSecret = null, CancellationToken ct = default)
     {
         if (host != null) _host = host;
         if (port != null) _port = port.Value;
+        if (adminPort != null) _adminPort = adminPort.Value;
         if (sharedSecret != null) _sharedSecret = sharedSecret;
 
         Disconnect();
@@ -52,11 +54,12 @@ public class McpBridgeClient : IDisposable
         _webSocket = new ClientWebSocket();
         _cts = CancellationTokenSource.CreateLinkedTokenSource(ct);
 
-        var uri = new Uri($"ws://{_host}:{_port}");
+        // Use admin_port (8444) for desktop companion app connection
+        var uri = new Uri($"ws://{_host}:{_adminPort}");
 
         try
         {
-            ConnectionStatusChanged?.Invoke(this, "Connecting to DuckBot MCP Bridge...");
+            ConnectionStatusChanged?.Invoke(this, $"Connecting to DuckBot MCP Bridge on port {_adminPort}...");
             await _webSocket.ConnectAsync(uri, _cts.Token);
 
             // Send authentication

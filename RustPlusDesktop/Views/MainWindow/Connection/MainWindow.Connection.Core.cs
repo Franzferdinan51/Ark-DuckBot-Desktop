@@ -250,9 +250,10 @@ public partial class MainWindow
                 await _mcpBridge.ConnectAsync(
                     TrackingService.McpHost ?? "localhost",
                     TrackingService.McpPort > 0 ? TrackingService.McpPort : 8443,
+                    TrackingService.AdminPort > 0 ? TrackingService.AdminPort : 8444,
                     TrackingService.McpSecret ?? "");
                 TrackingService.IsMcpConnected = _mcpBridge.IsConnected;
-                AppendLog($"MCP Bridge connected: {_mcpBridge.IsConnected}");
+                AppendLog($"MCP Bridge connected on port {TrackingService.AdminPort}: {_mcpBridge.IsConnected}");
             }
             catch (Exception ex)
             {
