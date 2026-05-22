@@ -9,7 +9,7 @@ ArkDuckBot Desktop is a WPF desktop application that connects to ARK: Survival A
 ### Core Capabilities
 
 - **Real-time Map Tracking** - Monitor players, dinosaurs, and events on ARK maps with live updates
-- **AI Chat Integration** - Connect to DuckBot AI-powered chat via the MCP Bridge ("Sheldon AI")
+- **AI Chat Integration** - Connect to DuckBot AI-powered chat via the MCP Bridge
 - **Server Pairing** - Connect to servers using `arkduckbot://` protocol links or manual configuration
 - **Player Tracking** - Monitor online players, tribe info, and server status in real-time
 - **System Tray** - Background operation with tray icon, desktop notifications, and quick actions
@@ -36,7 +36,7 @@ ArkDuckBot Desktop operates as a dual-client application, maintaining connection
 ┌─────────────────────────┐    ┌─────────────────────────────────────────────┐
 │  ARK Server             │    │  DuckBot MCP Bridge (Python)                │
 │  ┌───────────────────┐  │    │  ┌─────────────────────────────────────────┐│
-│  │ DuckBot ServerAPI │  │    │  │ Sheldon AI Agent Loop                    ││
+│  │ DuckBot ServerAPI │  │    │  │ DuckBot AI Agent Loop                     ││
 │  │ Plugin (C++)      │  │    │  │ - Intent Recognition                     ││
 │  │                   │  │    │  │ - Tool Routing                          ││
 │  │ • Game Events      │  │    │  │ - LLM Orchestration                     ││
@@ -79,13 +79,13 @@ The map panel provides live visualization of server activity:
 - ** Tribe Territories** - Grid-based tribe territory visualization
 - **Interactive Controls** - Zoom, pan, and click-to-teleport functionality
 
-### AI Chat via Sheldon AI
+### AI Chat via DuckBot
 
-Natural language interface powered by the DuckBot MCP Bridge:
+Natural language interface powered by DuckBot AI:
 
 ```
 Player: "Can you spawn me a Rex level 200 with 500 health?"
-Sheldon: "Sure! Spawning level 200 Rex with 500 extra health bonus..."
+DuckBot: "Sure! Spawning level 200 Rex with 500 extra health bonus..."
 Tool Call: spawn_dino → spcdino 2 200 0 0 500
 Result: Rex spawned successfully!
 ```
@@ -101,7 +101,7 @@ Result: Rex spawned successfully!
 | Category | Commands | Description |
 |----------|----------|-------------|
 | **Economy** | `/bal`, `/pay`, `/daily`, `/work`, `/coinflip`, `/gamble`, `/rich` | Player economy system with balance tracking |
-| **Teleport** | `/home`, `/sethome`, `/tpr`, `/tpaccept`, `/warp`, `/rtp`, `/配合` | Teleportation system with random teleport and配合 support |
+| **Teleport** | `/home`, `/sethome`, `/tpr`, `/tpaccept`, `/warp`, `/rtp` | Teleportation system with random teleport |
 | **Tribe** | `/tribe`, `/tdinos`, `/tribealert`, `/marker`, `/gridmap`, `/tribelog` | Tribe management and territory tools |
 | **Moderation** | `/kick`, `/ban`, `/unban`, `/mute`, `/unmute`, `/slay`, `/warn` | Admin moderation tools |
 | **Kits** | `/kits`, `/kit`, `/kitcooldown` | Custom kit system with cooldowns |
@@ -371,5 +371,5 @@ GPL-3.0 License - See [LICENSE](LICENSE) file for details
 
 - Original project inspiration: [Pronwan/rustplus-desktop](https://github.com/Pronwan/rustplus-desktop)
 - DuckBot architecture: [sheldon-mcp-bridge](https://github.com/nicholaslim99/sheldon-mcp-bridge)
-- Sheldon AI framework: [sheldon-ai-for-ark](https://github.com/ArkAscendedAI/sheldon-ai-for-ark)
+- DuckBot AI framework (inspired by sheldon-ai-for-ark): [sheldon-ai-for-ark](https://github.com/ArkAscendedAI/sheldon-ai-for-ark)
 - ARK AsaApi: Community ServerAPI project
